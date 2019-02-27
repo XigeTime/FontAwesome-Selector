@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,600,600i,800,800i');
+
+
+$font: 'Montserrat', sans-serif;
+body {
+  text-align:center;
+  font-family: $font;
+  background: #1abc9c;
+  color: #fff;
+}
+code,.icon_selections {
+  background: #1ba98d;
+  padding: 1rem;
+  display: block;
+  margin: 1em 0;
+  &:not(code) {
+    padding:0;
+    font-size:1.4em;
+    > i {
+      margin: 0 3px;
+      padding: 1rem;
+    }
+  }
+}
+// End demo styles
+
+
+
+$accent: #1abc9c;
+$white: #ffffff;
+
+#fa-selector {
+  position:relative; // All selector elements must have relative positioning. (Looking to remove this dependancy in fututre updates)
+  cursor: pointer;
+
+  // Required theme (default if no theme selected)
+  .fa-child-container {
+    position: absolute;
+    min-width: 300px;
+    max-height: 400px;
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    z-index:1;
+    left:0;
+    cursor: initial;
+
+    background: white;
+    color: black;
+    border: 1px solid grey;
+
+    input.search-fa-selector {
+      position: sticky;
+      top: 0;
+      width:100%;
+      padding: .2rem;
+    }
+    > i {
+      padding: .35em;
+      width: 20px;
+      cursor: pointer;
+    }
+  }
+
+
+  // Modern theme
+  &[data-theme='modern'] .fa-child-container {
+
+    border-radius: 5px;
+    min-width: 300px;
+    border: 1px solid darken($white, 3%);
+    box-shadow: 0 1px 1px darken($white, 20%);
+    justify-content: center;
+
+    input {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid darken($white, 3%);
+      outline: none;
+      padding: .8rem .8rem;
+      max-height: 41px;
+      margin-bottom: .5em;
+    }
+
+    i {
+      padding: .65em;
+      border-radius: 100px;
+      transition: all .3s;
+      margin: 2px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3em;
+      &:hover {
+        background: darken($white, 3%);
+        color: $accent;
+        box-shadow: 0 1px 1px darken($white, 20%);
+      }
+    }
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      border-radius: 5px;
+      padding: 2px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: $accent;
+      border: 1px solid $white;
+      border-radius: 5px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: $accent;
+    }
+  }
+  // Modern theme
+
+}
