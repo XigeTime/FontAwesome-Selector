@@ -11,13 +11,23 @@
 
     <div class="icon_selections"></div>
 
+    <h3>Icon Type</h3>
     <span onclick="toggleFaIconStyle(icons.solid,1,event)">Solid</span> <span onclick="toggleFaIconStyle(icons.regular,1,event)">Regular</span> <span onclick="toggleFaIconStyle(icons.brands,1,event)">Brands</span>
+
+    <h3>Selector Theme</h3>
+
+    <span onclick="toggleFaTheme('modern')">Modern</span> <span onclick="toggleFaTheme('')">default</span>
 
     <code>&lt;span onclick="<strong>openFaSelector(this,event)</strong>" id="fa-selector" data-theme="modern"&gt;Selector&lt;/span&gt;</code>
 
     <span onclick="openFaSelector(this,event)" id="fa-selector" data-theme="modern">Selector</span>
 
     <script src="script.js"></script>
-
+    <script>
+    // Theme toggle, for demo only..
+    function toggleFaTheme(theme) {
+    	document.getElementById("fa-selector").setAttribute("data-theme", theme);
+    }
+    </script>
   </body>
 </html>
