@@ -48,8 +48,10 @@ function openFaSelector(that,event) {
     event.target.children[0].style.display = "none";
 
   } else {
+
     event.target.classList.toggle('active');
     event.target.children[0].style.display = "";
+
   }
 
 }
@@ -183,7 +185,7 @@ function bindSearchTimers() {
 
   document.querySelectorAll(".fa-child-container input").forEach(function(el){
 
-    el.addEventListener('keyup', function() {
+    el.addEventListener('keyup', function(event) {
       clearTimeout(faSearchTypingTimer);
       faSearchTypingTimer = setTimeout(runFaIconSearch(event), faSearchInterval);
     });
@@ -195,7 +197,7 @@ function bindSearchTimers() {
 function runFaIconSearch(event) {
 
   faIconSearchResults = [];
-  faSearchInput = event.path[0].value;
+  faSearchInput = event.target.value;
 
   var selectorNumber = event.target.parentElement.getAttribute("data-num");
   var elem = document.querySelectorAll('.fa-child-container[data-num="' + selectorNumber + '"] > i');
@@ -214,7 +216,7 @@ function runFaIconSearch(event) {
 
   populateFaIcons(true,selectorNumber,selectedFaIconList);
 
-  event.path[0].focus();
+  event.target.focus();
 
 }
 

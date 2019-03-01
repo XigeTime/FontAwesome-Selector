@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,600,600i,800,800i');
 
-
 $font: 'Montserrat', sans-serif;
 body {
   text-align:center;
@@ -44,11 +43,9 @@ $white: #ffffff;
     z-index:1;
     left:0;
     cursor: initial;
-
     background: white;
     color: black;
     border: 1px solid grey;
-
     input.search-fa-selector {
       position: sticky;
       top: 0;
@@ -61,7 +58,6 @@ $white: #ffffff;
       cursor: pointer;
     }
   }
-
 
   // Modern theme
   &[data-theme='modern'] .fa-child-container {
