@@ -51,6 +51,7 @@ function openFaSelector(that,event) {
 
     event.target.classList.toggle('active');
     event.target.children[0].style.display = "";
+    event.target.children[0].children[0].focus();
 
   }
 
@@ -173,6 +174,7 @@ function createFaIconSearch() {
 
   searchNode.setAttribute("class", "search-fa-selector");
   searchNode.setAttribute("placeholder", "Search icons...");
+  searchNode.setAttribute("autofocus", "autofocus");
 
   faContainerNode.appendChild(searchNode);
 
