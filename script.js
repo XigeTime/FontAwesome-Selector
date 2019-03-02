@@ -50,6 +50,9 @@ function openFaSelector(that,event) {
   } else {
 
     event.target.classList.toggle('active');
+    if (event.target.offsetHeight != event.target.children[0].style.bottom) {
+      event.target.children[0].style.bottom = (event.target.offsetHeight + 10);
+    }
     event.target.children[0].style.display = "";
     event.target.children[0].children[0].focus();
 
@@ -117,13 +120,9 @@ function createContainer(event) {
       // Add attributes and style
   faNode.setAttribute("class", "fa-selector-container");
   faChildNode.setAttribute("class", "fa-child-container");
+  faChildNode.setAttribute("style", "bottom:" + (event.target.offsetHeight + 10) + "px;");
   faChildNode.setAttribute("data-num", faElCount);
   event.target.setAttribute("data-num", faElCount);
-  style = '<style>.fa-child-container[data-num="' + faElCount + '"] {' +
-            'top: ' + event.target.offsetHeight + 'px;' +
-          '}</style>';
-
-  document.querySelector('body').innerHTML += style;
 
   faContainerNode = faNode.appendChild(faChildNode);
 
