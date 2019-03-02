@@ -212,11 +212,24 @@ $white: #ffffff;
   position:relative; // All selector elements must have relative positioning. (Looking to remove this dependancy in fututre updates)
   cursor: pointer;
 
+  &.active:before {
+    content: "";
+    width: 0;
+    border: 10px solid;
+    border-color: white transparent transparent;
+    top: -11px;
+    display: block;
+    position: absolute;
+    z-index: 2;
+    left: 10px;
+  }
+
   // Required theme (default if no theme selected)
   .fa-child-container {
     position: absolute;
-    min-width: 300px;
-    max-height: 400px;
+    width:300px;
+    height: 400px;
+    box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
     overflow-y: scroll;
@@ -245,7 +258,7 @@ $white: #ffffff;
     border-radius: 5px;
     min-width: 300px;
     border: 1px solid darken($white, 3%);
-    box-shadow: 0 1px 1px darken($white, 20%);
+    box-shadow: 0 1px 1px rgba(72, 72, 72, 0.43);
     justify-content: center;
 
     input {
@@ -267,7 +280,7 @@ $white: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3em;
+      font-size: 1.3rem;
       &:hover {
         background: darken($white, 3%);
         color: $accent;
