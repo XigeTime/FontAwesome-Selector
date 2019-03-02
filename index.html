@@ -19,17 +19,14 @@
 
     <main>
 
-
-      <button onclick="openFaSelector(this,event)" id="fa-selector" data-theme="modern">CHECK IT OUT</button>
-
       <section>
 
           <ul class="selector_themes">
 
             <li class="title">Selector Theme:</li>
 
-            <li class="active" onclick="toggleFaTheme('modern')">Modern</li>
-            <li onclick="toggleFaTheme('')">Classic</li>
+            <li class="active" onclick="toggleFaTheme('modern',event)">Modern</li>
+            <li onclick="toggleFaTheme('',event)">Classic</li>
 
             <li class="disable">more soon...</li>
 
@@ -45,6 +42,8 @@
 
           </ul>
 
+          <button onclick="openFaSelector(this,event)" id="fa-selector" data-theme="modern">CHECK IT OUT</button>
+
           <p>A small unique javascript plugin enabling the ability to easily
             embed your own custom font awesome selector into your
             website.
@@ -59,9 +58,22 @@
     <script src="script.js"></script>
     <script>
     // Theme toggle, for demo only..
-    function toggleFaTheme(theme) {
+    function toggleFaTheme(theme,event) {
     	document.getElementById("fa-selector").setAttribute("data-theme", theme);
+      document.querySelectorAll("ul.selector_themes > li").forEach(function(el){
+        if (el.classList.contains("active")) { el.classList.toggle("active") }
+      })
+      event.target.classList.toggle("active");
     }
+
+    document.querySelectorAll("ul.icon_types > li").forEach(function(event){
+      event.addEventListener("click",function(event){
+        document.querySelectorAll("ul.icon_types > li").forEach(function(el){
+          if (el.classList.contains("active")) { el.classList.toggle("active") }
+        })
+        event.target.classList.toggle("active");
+      })
+    })
     </script>
 
 

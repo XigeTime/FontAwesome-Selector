@@ -37,13 +37,16 @@ body {
   background: $color;
   color: #fff;
   font-size: 100%;
+  margin: 0;
   @include fluid-type(font-size, $m750, 1200px, 14px, 22px);
 
 
   svg.backdrop {
     position: absolute;
-    left:0;
-    top:0;
+    left:10px;
+    right:10px;
+    top:10px;
+    width: calc(100% - 20px);
   }
 
   .light {
@@ -81,7 +84,7 @@ body {
     margin: auto;
     text-align: center;
 
-    padding-top: 6rem;
+    padding-top: 5.5rem;
 
     button,.btn {
       -webkit-appearance: none;
@@ -101,6 +104,9 @@ body {
       padding: 1rem 0;
       z-index:1;
 
+      margin: 4rem auto 2rem;
+      display: block;
+
       &.invert {
         background: transparent;
         color: white;
@@ -111,10 +117,12 @@ body {
 
     > section {
       border: 1px solid $dark-color;
+      border-bottom: 0;
       padding: 1.5rem;
       text-align: left;
       position: relative;
-      margin: 6rem auto 0;
+      z-index: 1;
+      margin: 0 auto;
 
       max-width: 590px;
       width: 100%;
@@ -131,6 +139,7 @@ body {
           margin: 0 5px;
           cursor: pointer;
           font-weight: 500;
+          border-radius: 2px;
 
           &.active {
             border: 1px solid #ffffff30;
@@ -155,8 +164,7 @@ body {
       }
 
       > .btn.invert {
-        margin: 4rem auto 2rem;
-        display: block;
+
       }
     }
   }
@@ -222,6 +230,10 @@ $white: #ffffff;
     position: absolute;
     z-index: 2;
     left: 10px;
+    &.bottom {
+      top: initial;
+      bottom: -11px;
+    }
   }
 
   // Required theme (default if no theme selected)

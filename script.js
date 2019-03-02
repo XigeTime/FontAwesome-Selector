@@ -1,8 +1,6 @@
 // Developed by Harry K (xigeti.me)
 
-var faSelector = document.getElementById("fa-selector"),
-    faSelectorContainer = document.getElementById("fa-child-container");
-    faElCount = false;
+var faElCount = false;
 
 function selectFaIcon(icon,event) {
 
@@ -109,7 +107,8 @@ function createFaElements(event) {
 function createContainer(event) {
   var faNode = document.createElement("div"),
       faChildNode = document.createElement("div"),
-      style = document.createElement('style');
+      style = document.createElement('style'),
+      faDropPos = "top";
 
   if (!faElCount) {
     faElCount = 1;
@@ -117,10 +116,14 @@ function createContainer(event) {
     faElCount++;
   }
 
+  if (!FaPositionTop) {
+    var faDropPos = "bottom";
+  }
+
       // Add attributes and style
   faNode.setAttribute("class", "fa-selector-container");
   faChildNode.setAttribute("class", "fa-child-container");
-  faChildNode.setAttribute("style", "bottom:" + (event.target.offsetHeight + 10) + "px;");
+  faChildNode.setAttribute("style", faDropPos + (event.target.offsetHeight + 10) + "px;");
   faChildNode.setAttribute("data-num", faElCount);
   event.target.setAttribute("data-num", faElCount);
 
