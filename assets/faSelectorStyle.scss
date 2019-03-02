@@ -6,6 +6,7 @@ $shadow: #6135C9;
 $m750: 750px;
 $m700: 700px;
 $m600: 600px;
+$m530: 530px;
 
 @function strip-unit($value) {
   @return $value / ($value * 0 + 1);
@@ -38,7 +39,11 @@ body {
   color: #fff;
   font-size: 100%;
   margin: 0;
-  @include fluid-type(font-size, $m750, 1200px, 14px, 22px);
+  @include fluid-type(font-size, $m750, 1200px, 12px, 18px);
+
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
 
 
   svg.backdrop {
@@ -59,7 +64,7 @@ body {
 
   header {
     width:90%;
-    margin: 10rem auto 0;
+    margin: 12% auto 0;
     h1 {
       font-size: 1.8em;
 
@@ -80,11 +85,9 @@ body {
     }
   }
   main {
-    width: 60%;
-    margin: auto;
     text-align: center;
-
-    padding-top: 5.5rem;
+    padding-top: 2.5rem 2.5rem 0;
+    width:100%;
 
     button,.btn {
       -webkit-appearance: none;
@@ -107,6 +110,10 @@ body {
       margin: 4rem auto 2rem;
       display: block;
 
+      &:active {
+        transform: translateY(1px);
+      }
+
       &.invert {
         background: transparent;
         color: white;
@@ -118,14 +125,17 @@ body {
     > section {
       border: 1px solid $dark-color;
       border-bottom: 0;
-      padding: 1.5rem;
+      padding: 1.5rem 20px;
       text-align: left;
       position: relative;
       z-index: 1;
       margin: 0 auto;
 
-      max-width: 590px;
-      width: 100%;
+      width: 60%;
+      max-width: 700px;
+      min-width: 270px;
+      box-sizing: border-box;
+      height: 56%;
 
       ul.selector_themes,ul.icon_types {
         display: block;
@@ -152,19 +162,25 @@ body {
             margin-left: 0;
           }
 
+          @media (max-width: $m700) {
+            margin-top: 1rem;
+            &.title {
+              display: block;
+              width: 100%;
+            }
+            &:nth-child(2) {
+              margin-left:0;
+            }
+          }
+
           &.disable {
             cursor: auto;
             font-weight: 300;
           }
         }
       }
-
       > p {
         margin: 4rem 0;
-      }
-
-      > .btn.invert {
-
       }
     }
   }
@@ -213,7 +229,7 @@ code,.icon_selections {
 
 
 
-$accent: #1abc9c;
+$accent: #7545E5;
 $white: #ffffff;
 
 #fa-selector {
@@ -276,7 +292,7 @@ $white: #ffffff;
     input {
       width: 100%;
       border: 0;
-      border-bottom: 1px solid darken($white, 3%);
+      background: rgb(243, 243, 243);
       outline: none;
       padding: .8rem .8rem;
       max-height: 41px;
