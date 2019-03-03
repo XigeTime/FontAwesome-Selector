@@ -42,6 +42,8 @@ body {
   @include fluid-type(font-size, $m750, 1200px, 12px, 18px);
 
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
   height: 100vh;
 
@@ -64,7 +66,7 @@ body {
 
   header {
     width:90%;
-    margin: 12% auto 0;
+    align-self: flex-end;
     h1 {
       font-size: 1.8em;
 
@@ -84,10 +86,13 @@ body {
       }
     }
   }
+
   main {
     text-align: center;
     padding-top: 2.5rem 2.5rem 0;
     width:100%;
+
+    align-self: flex-end;
 
     button,.btn {
       -webkit-appearance: none;
@@ -106,6 +111,7 @@ body {
       text-align: center;
       padding: 1rem 0;
       z-index:1;
+      transition: all .3s;
 
       margin: 4rem auto 2rem;
       display: block;
@@ -114,11 +120,21 @@ body {
         transform: translateY(1px);
       }
 
+      &:hover {
+        box-shadow: 2px 4px 16px #6135C9;
+        transform: translateY(-1px);
+      }
+
       &.invert {
         background: transparent;
         color: white;
         border: 1px solid white;
         box-shadow: none;
+
+        &:hover {
+          background: white;
+          color: $color;
+        }
       }
     }
 
@@ -128,14 +144,12 @@ body {
       padding: 1.5rem 20px;
       text-align: left;
       position: relative;
-      z-index: 1;
       margin: 0 auto;
 
       width: 60%;
       max-width: 700px;
       min-width: 270px;
       box-sizing: border-box;
-      height: 56%;
 
       ul.selector_themes,ul.icon_types {
         display: block;
