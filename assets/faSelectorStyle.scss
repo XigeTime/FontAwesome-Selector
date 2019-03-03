@@ -185,6 +185,17 @@ body {
     }
   }
 
+  .supported-browsers {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    font-size: 2em;
+    opacity: .2;
+    color: black;
+    max-width: 400px;
+    margin: 0 auto 4rem;
+  }
+
 }
 
 
