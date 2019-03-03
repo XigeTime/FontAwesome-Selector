@@ -1,6 +1,6 @@
 $font: 'Quicksand', sans-serif;
 $color: #7545E5;
-$dark-color: #5E29D950;
+$dark-color: rgba(94, 41, 217, 0.5);
 $shadow: #6135C9;
 
 $m750: 750px;
@@ -152,7 +152,7 @@ body {
           border-radius: 2px;
 
           &.active {
-            border: 1px solid #ffffff30;
+            border: 1px solid rgba(255,255,255,0.3);
           }
 
           &.title {
