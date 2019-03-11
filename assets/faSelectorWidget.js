@@ -3,18 +3,24 @@
 
 
 // CONFIG
-//
-// FA VERSION
-//-----------
-// You can change the version of font awesome you're using to prevent any errors in icons.
-// The oldest version of font awesome currently supported on our CDN is 5.7.2.
-// If you're using an older version of font awesome, you will need to host a modified version of the icon json file.
-var FASIconVersion = "5.7.2";
-// If you're using a locally hosted icon json file, add the url below.
-var FASiconUrl = "https://cdn.jsdelivr.net/gh/XigeTime/FontAwesome-Selector/cdn/faicons-v" + FASIconVersion +".json";
-//
-//
-// END CONFIG
+
+var FASconfig = {
+  // Specify the version of font awesome you are running
+  // NOTE: If you using the CDN, please make sure your version of font awesome is supported by FAS.
+  //       If you're using a version of font awesome that is not supported, you will need to host a modified version of the icon json file.
+	"iconVersion": "5.7.2",
+
+  // Uses CDN to fetch icon class names, set to false to use your own local file.
+  "useHostedJson": true,
+
+  // If "useHostedJson" is set to false, you must specify the location of the local json file here.
+  "fetchIconUrl": null,
+
+  //
+  "useFallbackCDN": true
+
+
+}
 
 
 
