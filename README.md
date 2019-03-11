@@ -12,10 +12,10 @@ Vanilla JS Font Awesome icon selector widget with zero dependancies, easy instal
 2. Clone or download this repository.
 
 3. Link to the FASelector CSS at the top of your HTML file.\
-`<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/XigeTime/FontAwesome-Selector/cdn/faSelectorStyle-vUNSTABLE.min">`
+`<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/XigeTime/FontAwesome-Selector/cdn/vUNSTABLE/faSelectorStyle.min">`
 
 4. Link to the FASelector JS just before the closing body tag in your HTML file.\
-`<script src="https://cdn.jsdelivr.net/gh/XigeTime/FontAwesome-Selector/cdn/faSelectorWidget-vUNSTABLE.min"></script>`
+`<script src="https://cdn.jsdelivr.net/gh/XigeTime/FontAwesome-Selector/cdn/vUNSTABLE/faSelectorWidget-vUNSTABLE.min"></script>`
 
 5. You will now be able to add your FASelectorWidget anywhere in your HTML file by using the onclick and ID attributes. *(Note, the widget element must be nestable. A, SPAN, DIV etc.. work for all browsers, some elements like BUTTON, don't work in firefox.)*\
 `onclick="openFaSelector(this,event)" id="fa-selector"`
