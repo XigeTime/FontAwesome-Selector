@@ -41,16 +41,9 @@ function openFaSelector(that,event) {
 
   } else if (!event.target.children.length) {
 
-    loadJSON(function(response) {
-
-       faIcons = JSON.parse(response);
-       selectedFaIconList = JSON.parse(response).solid;
-
-       event.target.classList.toggle('active');
-       createFaElements(event);
-       bindSearchTimers();
-
-    })
+    event.target.classList.toggle('active');
+    createFaElements(event);
+    bindSearchTimers();
 
   } else if (event.target.classList.contains("active")) {
 
@@ -103,15 +96,22 @@ function toggleFaIconStyle(style,selectorNumber,event) {
 
 }
 
-function createFaElements(event) {
+async function createFaElements(event) {
+
   // Create container element
   createContainer(event);
 
   // Add icon search
   createFaIconSearch();
 
-  // insert icons
-  populateFaIcons(false,faElCount,selectedFaIconList);
+  await FASloadJSON(function(response){
+    
+    faIcons = JSON.parse(response);
+    selectedFaIconList = JSON.parse(response).solid;
+
+    // insert icons
+    populateFaIcons(false,faElCount,selectedFaIconList);
+  });
 
 }
 
@@ -232,16 +232,30 @@ function runFaIconSearch(event) {
 
 }
 
-function loadJSON(callback) {
+async function FASloadJSON(callback) {
 
-   var xobj = new XMLHttpRequest();
-       xobj.overrideMimeType("application/json");
-   xobj.open('GET', FASiconUrl, true); // Replace 'my_data' with the path to your file
-   xobj.onreadystatechange = function () {
-         if (xobj.readyState == 4 && xobj.status == "200") {
+  if (FASconfig.useHostedJson == true) {
+
+    FASconfig.fetchIconUrl = "https://cdn.jsdelivr.net/gh/XigeTime/FontAwesome-Selector/cdn/faicons-v" + FASconfig.iconVersion +".json"
+
+  } else if (FASconfig.fetchIconUrl == null) {
+
+    alert("Please specify the location of the faicons.json file in your FAS config.");
+    return false;
+
+  }
+
+
+   var getIcons = new XMLHttpRequest();
+       getIcons.overrideMimeType("application/json");
+
+   getIcons.open('GET', FASconfig.fetchIconUrl, true);
+
+   getIcons.onreadystatechange = function () {
+         if (getIcons.readyState == 4 && getIcons.status == "200") {
            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-           callback(xobj.responseText);
+           callback(getIcons.responseText);
          }
    };
-   xobj.send(null);
+   getIcons.send(null);
 }
