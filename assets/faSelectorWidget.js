@@ -48,7 +48,6 @@ const FAS = {
 
 	    event.target.classList.toggle('active');
 	    FAS.createFaElements(event);
-	    FAS.bindSearchTimers();
 
 	  } else if (event.target.classList.contains("active")) {
 
@@ -62,7 +61,6 @@ const FAS = {
 	      event.target.children[0].style.bottom = (event.target.offsetHeight + 10);
 	    }
 	    event.target.children[0].style.display = "";
-	    event.target.children[0].children[0].focus();
 
 	  }
 	},
@@ -112,7 +110,8 @@ const FAS = {
 
 	  searchNode.setAttribute("class", "search-fa-selector");
 	  searchNode.setAttribute("placeholder", "Search icons...");
-	  searchNode.setAttribute("autofocus", "autofocus");
+		searchNode.setAttribute("autofocus", "autofocus");
+	  searchNode.setAttribute("onchange", "FAS.runFaIconSearch(event)");
 
 	  faContainerNode.appendChild(searchNode);
 	},
@@ -120,8 +119,22 @@ const FAS = {
 	populateFaIcons: (search,selectorNumber,all) => {
 		if (!all) {
 	    if (search == true) {
-	      FAV.iconsToPopulate = FAV.faIconSearchResults;
-	    } else {
+
+				if (FAV.faIconSearchResults.length > 0) {
+					FAV.iconsToPopulate = FAV.faIconSearchResults;
+				} else {
+					let msg = document.createElement("span")
+					msg.innerText = "No results found..";
+					faContainerNode.appendChild(msg);
+					if (selectorNumber) {
+				    document.querySelector("#fa-selector[data-num='" + selectorNumber + "']").appendChild(faContainerNode);
+				  } else {
+				    document.querySelector("#fa-selector.active").appendChild(faContainerNode);
+				  }
+					return false;
+				}
+
+			} else {
 	      FAV.iconsToPopulate = FAV.selectedFaIconList;
 	    }
 
@@ -147,6 +160,8 @@ const FAS = {
 	  } else {
 	    document.querySelector("#fa-selector.active").appendChild(faContainerNode);
 	  }
+
+		//FAS.bindSearchTimers();
 	},
 
 	populateThis: (array,prefix) => {
@@ -218,7 +233,7 @@ const FAS = {
 		FAV.faIconSearchResults = [];
 
 		elem.forEach(elem => {
-			elem.parentNode.removeChild(elem)
+			elem.parentNode.removeChild(elem);
 		})
 
 		FAV.selectedFaIconList.forEach(icon => {
