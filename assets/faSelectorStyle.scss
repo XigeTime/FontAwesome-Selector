@@ -36,13 +36,14 @@ $white: #ffffff;
     background: white;
     color: black;
     border: 1px solid grey;
+    bottom:51px;
     input.search-fa-selector {
       position: sticky;
       top: 0;
       width:100%;
       padding: .2rem;
     }
-    > i {
+    > i,svg {
       padding: .35em;
       width: 20px;
       cursor: pointer;
@@ -66,9 +67,16 @@ $white: #ffffff;
       padding: .8rem .8rem;
       max-height: 41px;
       margin-bottom: .5em;
+      display: none;
     }
 
-    i {
+    i.fa-spin {
+      display: none;
+      position: absolute;
+      opacity: .5;
+    }
+
+    i,svg {
       padding: .65em;
       border-radius: 100px;
       transition: all .3s;
