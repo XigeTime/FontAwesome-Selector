@@ -118,12 +118,12 @@ body {
       display: block;
 
       &:active {
-        transform: translateY(1px);
+        // transform: translateY(1px);
       }
 
       &:hover {
         box-shadow: 2px 4px 16px #6135C9;
-        transform: translateY(-1px);
+        // transform: translateY(-1px);
       }
 
       &.invert {

@@ -7,34 +7,46 @@ const FAS = {
 		iconUrl: 'https://cdn.jsdelivr.net/gh/FortAwesome/Font-Awesome/metadata/icons.json',
 
 		// Allowing all icons to be generated and shown at once is not recommended as this may cause performance issues..
-		allowAll: false,
+		allow_all: false,
 
-		// When allowAll is set too false, the default category will be the first category of icons loaded.
-		default_category: "brands",
+		// When allow_all is set too false, the default category will be the first category of icons loaded.
+		category: "solid",
 
 		// Total icons to load at a time.
 		total_load: 150,
 
 		// Scroll threshhold before a new load is triggered.
-		scroll_threshhold: 800 // 1100 is the reccomended setting for the [data-modern] theme.
+		scroll_threshhold: 500,
+
+		show_debug: true,
+
+		// When search is enabled, you must include "results" in this array
+		include_categorys: ["solid","regular","brands","results"],
+
+		search: {
+			enabled: true,
+			use_alias_terms: true,
+			search_all_icons: true,
+			field_placeholder: "Search icons..."
+		}
 	},
 
 	icons: null,
 	running: null,
-	loadedSave: 0,
-	allLoaded: false,
-	sortedIcons: {
-		brands: [],
-		solid: [],
-		regular: []
-	},
-	spinner: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="fas-spinner"><path d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"/></svg>',
+	selectors: {},
 
-	fetchIcons: () => {
-		console.log("FAS: Loading & sorting icons..");
+	fetchIcons: selector_id => {
+
+		if (FAS.config.show_debug) {
+			console.log("FAS: Loading & sorting icons..");
+		}
+
 		return new Promise((resolve) => {
 
-			let lt1 = performance.now();
+			if (FAS.config.show_debug) {
+				lt1 = performance.now();
+			}
+
 			let icons = new XMLHttpRequest();
 
 			icons.overrideMimeType("application/json");
@@ -44,7 +56,7 @@ const FAS = {
 
 			  if (icons.readyState == 4 && icons.status == "200") {
 			    FAS.icons = JSON.parse(icons.responseText);
-					FAS.sortIcons(lt1);
+					FAS.sortIcons(lt1,selector_id);
 					resolve();
 			  }
 
@@ -54,34 +66,45 @@ const FAS = {
 
 	},
 
-	sortIcons: lt1 => {
+	sortIcons: (lt1,selector_id) => {
 		Object.values(FAS.icons).forEach(i => {
 
 			i.styles.forEach(style => {
-				FAS.sortedIcons[style].push(i);
+				FAS.selectors[selector_id].sortedIcons[style].icons.push(i);
 			})
 
 		})
-		let lt2 = performance.now();
-		console.log("FAS: Icons loaded & sorted into categories in " + (lt2 - lt1).toFixed() + "ms.");
-	},
 
-	outPutIcons: async selector_id => {
-		FAS.running = true;
-		FAS.addLoader(selector_id);
-
-		if (FAS.icons == null) {
-			let icons = await FAS.fetchIcons();
+		if (FAS.config.show_debug) {
+			let lt2 = performance.now();
+			console.log("FAS: Icons loaded & sorted into categories in " + (lt2 - lt1).toFixed() + "ms.");
 		}
 
-		let lt1 = performance.now();
-		console.log("FAS: Outputting icons..");
-		//..
-		let selector = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container");
+	},
+
+	outPutIcons: async (selector_id,is_search) => {
+		FAS.running = true;
+
+		if (FAS.icons == null) {
+			// If we havent loaded the icons yet, load them in!
+			let icons = await FAS.fetchIcons(selector_id);
+		}
+
+		if (FAS.config.show_debug) {
+			lt1 = performance.now();
+			console.log("FAS: Outputting icons..");
+		}
+
+		let selector = null;
+		if (is_search) {
+			selector = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container .results");
+		} else {
+			selector = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container ." + FAS.selectors[selector_id].category);
+		}
 
 		let output = new Promise((resolve) => {
-			if (FAS.config.allowAll) {
-				console.log("FAS Error: AllowAll is currently not supported until pagination/infinite scroll is available..")
+			if (FAS.config.allow_all) {
+				console.log("FAS Error: allow_all is currently not supported until pagination/infinite scroll is available..")
 				//
 				// Object.keys(FAS.sortedIcons).forEach(category => {
 				// 	Object.values(FAS.sortedIcons[category]).forEach(icon => {
@@ -92,23 +115,44 @@ const FAS = {
 				// })
 				resolve();
 			} else {
-				let arr = Object.values(FAS.sortedIcons[FAS.config.default_category]);
-				for (let i=FAS.loadedSave; i < arr.length; i++) {
-					if (i >= (FAS.config.total_load + FAS.loadedSave)) {
-						FAS.loadedSave = i;
+				let obj = null;
+				let arr = null;
+				if (is_search) {
+					obj = is_search;
+					arr = is_search.icons;
+				} else {
+					obj = FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category]
+					arr = Object.values(obj.icons);
+				}
+
+				for (let i=obj.loaded; i < arr.length; i++) {
+					if (i >= (FAS.config.total_load + obj.loaded)) {
+						// Stop loading icons once results meet the threshhold.
+						obj.loaded = i;
+						FAS.config.scroll_threshhold = FAS.config.scroll_threshhold - 500;
 						resolve();
 						break;
-					} else if ((i+1) >= arr.length) {
-						console.log("FAS: All icons loaded.");
-						FAS.allLoaded = true;
-						FAS.loadedSave = i;
-						resolve();
-						break;
+
 					} else {
+						// delaying output by 1ms allows for a smooth flow of results.
 						setTimeout(() => {
-							selector.innerHTML  += arr[i].svg[FAS.config.default_category].raw;
+							if (is_search) {
+								arr[i].styles.forEach(style => {
+									selector.insertAdjacentHTML("beforeend",arr[i].svg[style].raw);
+								})
+							} else {
+								selector.insertAdjacentHTML("beforeend",arr[i].svg[FAS.selectors[selector_id].category].raw);
+							}
+
 							if ((i+1) >= arr.length) {
-								FAS.loadedSave = i;
+								// All icons of this category have loaded.
+								obj.all_loaded = true;
+								obj.loaded = i;
+
+								if (FAS.config.show_debug) {
+									console.log("FAS: All icons loaded.");
+								}
+
 								resolve();
 							}
 						},1)
@@ -119,21 +163,170 @@ const FAS = {
 
 			}
 		})
-		 await output;
-		 FAS.removeLoader(selector_id);
-		 console.log("FAS: Outputting icons completed in " + (performance.now() - lt1).toFixed() + "ms");
-		 setTimeout(() => {
-			 FAS.running = false;
-		 },100)
+		await output;
+		if (FAS.config.show_debug) {
+			console.log("FAS: Outputting icons completed in " + (performance.now() - lt1).toFixed() + "ms");
+		}
+		setTimeout(() => {
+		 	// Use timeout to prevent constant scrolling flooding the loading system.
+			FAS.running = false;
+		},100)
 	},
 
-	addLoader: selector => {
-		document.querySelector("[data-selector='" + selector + "'] .fa-child-container").innerHTML += FAS.spinner;
+	initSelector: () => {
+		if (event.target.id !== "fa-selector") return false;
+		if (event.target.children.length == 0) {
+
+			FAS.createChildren(event.target.dataset.selector);
+			FAS.createCategorys(event.target.dataset.selector);
+			FAS.outPutIcons(event.target.dataset.selector);
+
+			FAS.selectors[event.target.dataset.selector] = {
+				category: FAS.config.category,
+				sortedIcons: {
+					brands: {
+						all_loaded: false,
+						loaded: 0,
+						icons: []
+					},
+					solid: {
+						all_loaded: false,
+						loaded: 0,
+						icons: []
+					},
+					regular: {
+						all_loaded: false,
+						loaded: 0,
+						icons: []
+					}
+				},
+			};
+
+		}
+
 	},
-	removeLoader: selector => {
-		document.querySelector("[data-selector='" + selector + "'] .fa-child-container #fas-spinner").outerHTML = "";
+
+	createChildren: selector_id => {
+		let selector = document.querySelector("[data-selector='" + selector_id + "']");
+
+		let childContainer = document.createElement("span");
+		childContainer.setAttribute("class", "fa-child-container");
+		selector.appendChild(childContainer);
+
+		let searchField = document.createElement("input");
+		searchField.setAttribute("placeholder", FAS.config.search.field_placeholder);
+		searchField.setAttribute("onkeyup", "FAS.searchIcons()");
+		selector.children[0].appendChild(searchField);
+
+		let el = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container");
+		el.addEventListener('scroll', () => {
+			let selector_id = el.parentElement.dataset.selector;
+			if (FAS.running != true && FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category].all_loaded != true && el.scrollTop > FAS.config.scroll_threshhold) {
+				FAS.config.scroll_threshhold = FAS.config.scroll_threshhold + (FAS.config.scroll_threshhold - 200);
+				FAS.outPutIcons(selector_id);
+			}
+		})
+	},
+
+	createIconContainers: selector => {
+		FAS.config.include_categorys.forEach(category => {
+			let el = document.createElement("div");
+			el.setAttribute("class", category);
+			selector.appendChild(el);
+		})
+	},
+
+	createCategorys: selector_id => {
+
+		let categorys = [];
+		let selector = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container");
+
+		FAS.config.include_categorys.forEach(category => {
+
+			if (category == "results") return false;
+
+			let el = document.createElement("span");
+			el.setAttribute("onclick", "FAS.setCategory('" + category + "'," + selector_id + ")");
+			el.setAttribute("class", "FASCategory");
+			el.innerText = category;
+
+			categorys.push(el);
+
+		})
+
+		let categoryContainer = document.createElement("div");
+		categoryContainer.setAttribute("class", "FACatagorys");
+
+		for (let i=0; i < categorys.length; i++) {
+			categoryContainer.appendChild(categorys[i]);
+		}
+
+		selector.appendChild(categoryContainer);
+
+		FAS.createIconContainers(selector);
+	},
+
+	setCategory: (category,selector_id) => {
+		let catContainer = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container ." + category);
+
+		if (catContainer.offsetHeight > 0) {
+			// check if category is currently visible.
+			return false;
+		} else {
+
+			FAS.clearSelector(selector_id);
+
+			FAS.selectors[selector_id].category = category;
+			FAS.outPutIcons(selector_id);
+			catContainer.classList.remove("hidden");
+			catContainer.style.display = "flex";
+
+		}
+
+	},
+
+	clearSelector: selector_id => {
+		document.querySelectorAll("[data-selector='" + selector_id + "'] .fa-child-container > div").forEach(cat => {
+			if (cat.classList.contains("FACatagorys") != true) {
+				cat.style = "";
+				cat.classList.add("hidden");
+			}
+		})
+	},
+
+	searchIcons: () => {
+		let searchedFor = event.target.value.toLowerCase();
+		let selector_id = event.target.parentElement.parentElement.dataset.selector;
+		let results = {
+			all_loaded: false,
+			loaded: 0,
+			icons: []
+		};
+		results.icons.length = 0;
+		let search = FAS.icons;
+		if (!FAS.config.search_all_icons) {
+			//...
+		}
+
+		Object.values(search).forEach(icon => {
+			if (icon.label.toLowerCase().includes(searchedFor)) {
+				results.icons.push(icon);
+				return;
+			}
+
+			icon.search.terms.forEach(term => {
+			  if (term.includes(searchedFor)) {
+			  	results.icons.push(icon)
+			  	return;
+			  }
+			})
+			return;
+		})
+		FAS.clearSelector(selector_id);
+		document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container .results").innerHTML = null;
+		FAS.outPutIcons(selector_id, results);
+		document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container .results").style.display = "flex";
 	}
-
 
 }
 
@@ -143,309 +336,6 @@ const FAS = {
 
 document.querySelectorAll("#fa-selector").forEach(el => {
 	el.addEventListener("click", () => {
-		if (event.target.id !== "fa-selector") return false;
-		if (event.target.children[0].children.length <= 1) {
-			FAS.outPutIcons(event.target.dataset.selector);
-		}
+		FAS.initSelector();
 	})
 })
-
-
-document.querySelectorAll(".fa-child-container").forEach(el => {
-	el.addEventListener('scroll', () => {
-		if (FAS.running != true && FAS.allLoaded != true && el.scrollTop > FAS.config.scroll_threshhold) {
-			FAS.config.scroll_threshhold = FAS.config.scroll_threshhold + (FAS.config.scroll_threshhold - 500);
-		  FAS.outPutIcons(el.parentElement.dataset.selector);
-		}
-  })
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-// let FAV = {
-// 	searchTypingTimer: null,
-// 	selectedFaIconList: null,
-// 	faIcons: null,
-// 	faElCount: null,
-// 	iconsToPopulate: null,
-// 	faIconSearchResults: []
-// };
-//
-//const FAS = {
-// 	// CONFIG
-// 	config: {
-// 		// Specify the version of font awesome you are running
-// 	  // NOTE: If you using the CDN, please make sure your version of font awesome is supported by FAS.
-// 	  //       If you're using a version of font awesome that is not supported, you will need to host a modified version of the icon json file.
-// 		iconVersion: "5.7.2",
-//
-// 	  // Uses CDN to fetch icon class names, set to false to use your own local file.
-// 	  useHostedJson: true,
-//
-// 	  // If "useHostedJson" is set to false, you must specify the location of the local json file here.
-// 	  fetchIconUrl: null,
-//
-// 	  // Enable icon search
-// 	  search: true,
-//
-// 	  // Default icon style
-// 	  iconStyle: "solid",
-//
-// 		searchInterval: 500
-//
-// 	},
-//
-// 	selectFaIcon: () => {
-// 		// modify this to add your icon where desired
-// 	},
-//
-// 	openFaSelector: (that,event) => {
-//
-// 	  if (event.target.parentElement.classList.contains("fa-child-container")) {
-//
-// 	    if (event.target.getAttribute("onclick") != "FAS.selectFaIcon(this,event)") return false;
-//
-// 	  } else if (!event.target.children.length) {
-//
-// 	    event.target.classList.toggle('active');
-// 	    FAS.createFaElements(event);
-//
-// 	  } else if (event.target.classList.contains("active")) {
-//
-// 	    event.target.classList.toggle('active');
-// 	    event.target.children[0].style.display = "none";
-//
-// 	  } else {
-//
-// 	    event.target.classList.toggle('active');
-// 	    if (event.target.offsetHeight != event.target.children[0].style.bottom) {
-// 	      event.target.children[0].style.bottom = (event.target.offsetHeight + 10);
-// 	    }
-// 	    event.target.children[0].style.display = "";
-//
-// 	  }
-// 	},
-//
-// 	createFaElements: async event => {
-// 		// Create container element
-// 		FAS.createContainer(event);
-//
-// 		if (FAS.config.search) {
-// 			// Add icon search
-// 			FAS.createFaIconSearch();
-// 		}
-//
-// 		await FAS.FASloadJSON(response => {
-//
-// 			FAV.faIcons = JSON.parse(response);
-// 			FAV.selectedFaIconList = FAV.faIcons[FAS.config.iconStyle];
-//
-// 			// insert icons
-// 			FAS.populateFaIcons(false,FAV.faElCount,true);
-// 		});
-// 	},
-//
-// 	createContainer: event => {
-// 		let faNode = document.createElement("div");
-// 	  let faChildNode = document.createElement("div");
-// 	  let style = document.createElement('style');
-//
-// 	  if (!FAV.faElCount) {
-// 	    FAV.faElCount = 1;
-// 	  } else {
-// 	    FAV.faElCount++;
-// 	  }
-//
-// 	  // Add attributes and style
-// 	  faNode.setAttribute("class", "fa-selector-container");
-// 	  faChildNode.setAttribute("class", "fa-child-container");
-// 	  faChildNode.setAttribute("style", "bottom:" + (event.target.offsetHeight + 10) + "px;");
-// 	  faChildNode.setAttribute("data-num", FAV.faElCount);
-// 	  event.target.setAttribute("data-num", FAV.faElCount);
-//
-// 	  faContainerNode = faNode.appendChild(faChildNode);
-// 	},
-//
-// 	createFaIconSearch: () => {
-// 		let searchNode = document.createElement("input");
-//
-// 	  searchNode.setAttribute("class", "search-fa-selector");
-// 	  searchNode.setAttribute("placeholder", "Search icons...");
-// 		searchNode.setAttribute("autofocus", "autofocus");
-// 	  searchNode.setAttribute("onchange", "FAS.runFaIconSearch(event)");
-//
-// 	  faContainerNode.appendChild(searchNode);
-// 	},
-//
-// 	populateFaIcons: (search,selectorNumber,all) => {
-// 		if (!all) {
-// 	    if (search == true) {
-//
-// 				if (FAV.faIconSearchResults.length > 0) {
-// 					FAV.iconsToPopulate = FAV.faIconSearchResults;
-// 				} else {
-// 					let msg = document.createElement("span")
-// 					msg.innerText = "No results found..";
-// 					faContainerNode.appendChild(msg);
-// 					if (selectorNumber) {
-// 				    document.querySelector("#fa-selector[data-num='" + selectorNumber + "']").appendChild(faContainerNode);
-// 				  } else {
-// 				    document.querySelector("#fa-selector.active").appendChild(faContainerNode);
-// 				  }
-// 					return false;
-// 				}
-//
-// 			} else {
-// 	      FAV.iconsToPopulate = FAV.selectedFaIconList;
-// 	    }
-//
-// 	    if (FAV.selectedFaIconList == FAV.faIcons.regular) {
-// 	      var prefix = "far";
-// 	    } else if (FAV.selectedFaIconList == FAV.faIcons.brands) {
-// 	      var prefix = "fab";
-// 	    } else {
-// 	      var prefix = "fas";
-// 	    }
-//
-// 	    FAS.populateThis(FAV.iconsToPopulate,prefix);
-// 	  } else {
-//
-// 	    FAS.populateThis(FAV.faIcons.solid,"fas");
-// 	    FAS.populateThis(FAV.faIcons.regular,"far");
-// 	    FAS.populateThis(FAV.faIcons.brands,"fab");
-//
-// 	  }
-//
-// 	  if (selectorNumber) {
-// 	    document.querySelector("#fa-selector[data-num='" + selectorNumber + "']").appendChild(faContainerNode);
-// 	  } else {
-// 	    document.querySelector("#fa-selector.active").appendChild(faContainerNode);
-// 	  }
-//
-// 		//FAS.bindSearchTimers();
-// 	},
-//
-// 	populateThis: (array,prefix) => {
-// 		array.forEach(icon => {
-//
-// 	    let i = document.createElement("i");
-// 	    let iconClassName = prefix + " fa-" + icon;
-//
-// 	    i.setAttribute("class", iconClassName);
-// 	    i.setAttribute("onclick", "selectFaIcon(this,event)");
-//
-// 	    faContainerNode.appendChild(i);
-//
-// 	  })
-// 	},
-//
-// 	bindSearchTimers: () => {
-//
-// 	  document.querySelectorAll(".fa-child-container input").forEach(el => {
-//
-// 	    el.addEventListener('keyup', event => {
-// 	      clearTimeout(FAV.searchTypingTimer);
-// 	      FAV.searchTypingTimer = setTimeout(FAS.runFaIconSearch(event), FAS.config.searchInterval);
-// 	    });
-// 	    el.addEventListener('keydown', clearTimeout(FAV.searchTypingTimer));
-//
-// 	  })
-// 	},
-//
-// 	toggleFaIconStyle: (style,selectorNumber,event) => {
-//
-// 		FAV.selectedFaIconList = style;
-//
-// 	  let elem = document.querySelectorAll('.fa-child-container[data-num="' + selectorNumber + '"] > i');
-//
-// 	  elem.forEach(elem => {
-// 	    elem.parentNode.removeChild(elem)
-// 	  })
-//
-// 	  if (FAS.config.search) {
-// 	    let faSearchInput = document.querySelector('.fa-child-container[data-num="' + selectorNumber + '"] > input');
-//
-// 	    var search = false;
-// 	    if (faSearchInput.value != "") {
-//
-// 	      var search = true;
-// 	      FAV.faIconSearchResults = [];
-//
-// 	      FAV.selectedFaIconList.forEach(icon => {
-//
-// 	      	if (icon.includes(faSearchInput.value)) {
-// 	      	    FAV.faIconSearchResults.push(icon);
-// 	      	}
-//
-// 	      })
-//
-// 	      style = FAV.faIconSearchResults;
-// 	    }
-// 	  }
-//
-// 	  FAS.populateFaIcons(search,FAV.faElCount);
-// 	},
-//
-// 	runFaIconSearch: event => {
-// 		let faSearchInput = event.target.value;
-// 	 	let selectorNumber = event.target.parentElement.getAttribute("data-num");
-// 		let elem = document.querySelectorAll('.fa-child-container[data-num="' + selectorNumber + '"] > i');
-//
-// 		FAV.faIconSearchResults = [];
-//
-// 		elem.forEach(elem => {
-// 			elem.parentNode.removeChild(elem);
-// 		})
-//
-// 		FAV.selectedFaIconList.forEach(icon => {
-//
-// 			if (icon.includes(faSearchInput)) {
-// 					FAV.faIconSearchResults.push(icon);
-// 			}
-//
-// 		})
-//
-// 		FAS.populateFaIcons(true,selectorNumber);
-// 	},
-// //
-// 	FASloadJSON: callback => {
-// 		if (FAS.config.useHostedJson == true) {
-//
-// 	    FAS.config.fetchIconUrl = "https://cdn.jsdelivr.net/gh/XigeTime/FontAwesome-Selector/cdn/faicons-v" + FAS.config.iconVersion +".json"
-//
-// 	  } else if (FAS.config.fetchIconUrl == null) {
-//
-// 	    alert("Please specify the location of the faicons.json file in your FAS config.");
-// 	    return false;
-//
-// 	  }
-// 		var getIcons = new XMLHttpRequest();
-//         getIcons.overrideMimeType("application/json");
-//
-//     getIcons.open('GET', FAS.config.fetchIconUrl, true);
-//
-//     getIcons.onreadystatechange = function () {
-//           if (getIcons.readyState == 4 && getIcons.status == "200") {
-//             // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-//             callback(getIcons.responseText);
-//           }
-//     };
-//     getIcons.send(null);
-// 	}
-//
-// };
