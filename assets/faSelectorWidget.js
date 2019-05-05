@@ -15,7 +15,10 @@ const FAS = {
 		// Scroll threshhold before a new load is triggered.
 		scroll_threshhold: 500,
 
-		// Enable debug mode to recieve time stamps and logs
+		show_unicode: false,
+		show_labels: false,
+
+		// Enable debug mode to recieve time stamps and logs in the console
 		debug: {
 			enabled: false,
 
@@ -126,20 +129,52 @@ const FAS = {
 						if (is_search) {
 							if (FAS.config.search.search_all_icons || FAS.selectors[selector_id].category == "all") {
 								arr[i].styles.forEach(style => {
-									selector.insertAdjacentHTML("beforeend",arr[i].svg[style].raw);
+									let uni;
+									let label;
+									if (FAS.config.show_unicode) {
+										uni = arr[i].unicode;
+									}
+									if (FAS.config.show_labels) {
+										label = arr[i].label;
+									}
+									FAS.outputThis(selector,arr[i].svg[style].raw,uni,label)
 								})
 							} else {
+								let uni;
+								let label;
+								if (FAS.config.show_unicode) {
+									uni = arr[i].unicode;
+								}
+								if (FAS.config.show_labels) {
+									label = arr[i].label;
+								}
 								if (arr[i].svg[FAS.selectors[selector_id].category]) {
-									selector.insertAdjacentHTML("beforeend",arr[i].svg[FAS.selectors[selector_id].category].raw);
+									FAS.outputThis(selector,arr[i].svg[FAS.selectors[selector_id].category].raw,uni,label)
 								}
 							}
 						} else {
 							if (FAS.selectors[selector_id].category == "all") {
 								arr[i].styles.forEach(style => {
-									selector.insertAdjacentHTML("beforeend",arr[i].svg[style].raw);
+									let uni;
+									let label;
+									if (FAS.config.show_unicode) {
+										uni = arr[i].unicode;
+									}
+									if (FAS.config.show_labels) {
+										label = arr[i].label;
+									}
+									FAS.outputThis(selector,arr[i].svg[style].raw,uni,label)
 								})
 							} else {
-								selector.insertAdjacentHTML("beforeend",arr[i].svg[FAS.selectors[selector_id].category].raw);
+								let uni;
+								let label;
+								if (FAS.config.show_unicode) {
+									uni = arr[i].unicode;
+								}
+								if (FAS.config.show_labels) {
+									label = arr[i].label;
+								}
+								FAS.outputThis(selector,arr[i].svg[FAS.selectors[selector_id].category].raw,uni,label)
 							}
 						}
 
@@ -168,6 +203,29 @@ const FAS = {
 		 	// Use timeout to prevent constant scrolling flooding the loading system.
 			FAS.running = false;
 		},100)
+	},
+
+	outputThis: (selector,svg,uni,label) => {
+		if (uni || label) {
+			let el = document.createElement("i");
+			if (uni) {
+				let uniCode = document.createElement("span");
+				uniCode.innerText = "#" + uni;
+				el.appendChild(uniCode);
+			}
+
+			if (label) {
+				let name = document.createElement("strong");
+				name.innerText = label;
+				el.appendChild(name);
+			}
+
+			el.insertAdjacentHTML("beforeend",svg);
+			selector.appendChild(el);
+		} else {
+			selector.insertAdjacentHTML("beforeend",svg);
+		}
+
 	},
 
 	initSelector: async () => {
@@ -390,7 +448,7 @@ document.querySelectorAll("[data-fa-selector]").forEach(el => {
 			FAS.initSelector();
 		} else if (event.target.dataset.faSelector && event.target.children[0].offsetHeight > 0) {
 			event.target.children[0].style.display = "none";
-		} else if (!event.target.classList.contains("FASCategory") && event.target.nodeName != "INPUT") {
+		} else if (event.target.dataset.faSelector) {
 			event.target.children[0].style.display = "block";
 		}
 		return false;

@@ -34,16 +34,13 @@ $white: #ffffff;
         border-bottom: 1px solid darken($white, 8%);
         cursor: pointer;
         transition: background .3s;
+        border-right: 1px solid darken($white, 8%);
 
         &:hover {
           background: darken($white, 6%);
         }
-
-        &:first-child {
-          border-right: 1px solid darken($white, 8%);
-        }
         &:last-child {
-          border-left: 1px solid darken($white, 8%);
+          border-right: none;
         }
       }
     }
@@ -56,18 +53,36 @@ $white: #ffffff;
       &.hidden {
         display: none;
       }
-      > i,svg {
-        padding: .65em;
-        border-radius: 100px;
+      > i,> svg {
+        padding: .55em .2em;
+        border-radius: 10px;
         transition: all .3s;
         margin: 2px;
-        height: 20px;
-        width: 25px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.3rem;
         cursor: pointer;
+        flex-direction: column-reverse;
+        flex-basis: calc(25% - 4px);
+        box-sizing: border-box;
+        &:not(i) {
+          height: 55px;
+          padding: .5em;
+        }
+        > span,> strong {
+          font-size: 9px;
+          font-style: normal;
+          position: relative;
+          transform: translateY(3px);
+          &:not(strong) {
+            font-weight: normal;
+          }
+        }
+        > svg {
+          height: 20px;
+          width: 25px;
+        }
         &:hover {
           background: darken($white, 3%);
           color: $accent;
