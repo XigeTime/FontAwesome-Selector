@@ -6,11 +6,8 @@ const FAS = {
 	config: {
 		iconUrl: 'https://cdn.jsdelivr.net/gh/FortAwesome/Font-Awesome/metadata/icons.json',
 
-		// Allowing all icons to be generated and shown at once is not recommended as this may cause performance issues..
-		allow_all: false,
-
-		// When allow_all is set too false, the default category will be the first category of icons loaded.
-		category: "solid",
+		// This is the default category shown when the selector is first loaded.
+		category: "regular",
 
 		// Total icons to load at a time.
 		total_load: 150,
@@ -18,16 +15,24 @@ const FAS = {
 		// Scroll threshhold before a new load is triggered.
 		scroll_threshhold: 500,
 
-		show_debug: true,
+		// Enable debug mode to recieve time stamps and logs
+		debug: {
+			enabled: false,
 
-		// When search is enabled, you must include "results" in this array
-		include_categorys: ["solid","regular","brands","results"],
+			lt1: null, 	// Used for storing timestamp values.
+			lt2: null 	// Used for storing timestamp values.
+		},
+
+		// NOTE: When search is enabled, you MUST include "results" in this array!
+		// NOTE: Your default icon category MUST be included in this array!
+		// You can add "all" here to have a category containing all available icons.
+		include_categorys: ["all","solid","regular","brands","results"],
 
 		search: {
-			enabled: true,
-			use_alias_terms: true,
-			search_all_icons: true,
-			field_placeholder: "Search icons..."
+			enabled: true, 					// Enable/disable the search for all selectors.
+			use_alias_terms: true,	// If true, the search will return results for common aliases. E.g: Search; 'social', returns; 'facebook' etc..
+			search_all_icons: false,// If true, the search will search through all categorys, reguardless of currentlly selected category.
+			field_placeholder: "Search icons..." // Placeholder text for the selectors search box.
 		}
 	},
 
@@ -37,14 +42,14 @@ const FAS = {
 
 	fetchIcons: selector_id => {
 
-		if (FAS.config.show_debug) {
+		if (FAS.config.debug.enabled) {
 			console.log("FAS: Loading & sorting icons..");
 		}
 
 		return new Promise((resolve) => {
-
-			if (FAS.config.show_debug) {
-				lt1 = performance.now();
+			FAS.config.debug.lt1 = null;
+			if (FAS.config.debug.enabled) {
+				FAS.config.debug.lt1 = performance.now();
 			}
 
 			let icons = new XMLHttpRequest();
@@ -56,7 +61,6 @@ const FAS = {
 
 			  if (icons.readyState == 4 && icons.status == "200") {
 			    FAS.icons = JSON.parse(icons.responseText);
-					FAS.sortIcons(lt1,selector_id);
 					resolve();
 			  }
 
@@ -66,7 +70,7 @@ const FAS = {
 
 	},
 
-	sortIcons: (lt1,selector_id) => {
+	sortIcons: (selector_id) => {
 		Object.values(FAS.icons).forEach(i => {
 
 			i.styles.forEach(style => {
@@ -75,9 +79,9 @@ const FAS = {
 
 		})
 
-		if (FAS.config.show_debug) {
-			let lt2 = performance.now();
-			console.log("FAS: Icons loaded & sorted into categories in " + (lt2 - lt1).toFixed() + "ms.");
+		if (FAS.config.debug.enabled) {
+			FAS.config.debug.lt2 = performance.now();
+			console.log("FAS: Icons loaded & sorted into categories in " + (FAS.config.debug.lt2 - FAS.config.debug.lt1).toFixed() + "ms.");
 		}
 
 	},
@@ -85,13 +89,8 @@ const FAS = {
 	outPutIcons: async (selector_id,is_search) => {
 		FAS.running = true;
 
-		if (FAS.icons == null) {
-			// If we havent loaded the icons yet, load them in!
-			let icons = await FAS.fetchIcons(selector_id);
-		}
-
-		if (FAS.config.show_debug) {
-			lt1 = performance.now();
+		if (FAS.config.debug.enabled) {
+			FAS.config.debug.lt1 = performance.now();
 			console.log("FAS: Outputting icons..");
 		}
 
@@ -103,69 +102,67 @@ const FAS = {
 		}
 
 		let output = new Promise((resolve) => {
-			if (FAS.config.allow_all) {
-				console.log("FAS Error: allow_all is currently not supported until pagination/infinite scroll is available..")
-				//
-				// Object.keys(FAS.sortedIcons).forEach(category => {
-				// 	Object.values(FAS.sortedIcons[category]).forEach(icon => {
-				// 		setTimeout(() => {
-				// 			selector.innerHTML  += icon.svg[category].raw;
-				// 		},5);
-				// 	})
-				// })
-				resolve();
+			let obj = null;
+			let arr = null;
+			if (is_search) {
+				obj = is_search;
+				arr = is_search.icons;
 			} else {
-				let obj = null;
-				let arr = null;
-				if (is_search) {
-					obj = is_search;
-					arr = is_search.icons;
+				obj = FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category]
+				arr = Object.values(obj.icons);
+			}
+
+			for (let i=obj.loaded; i < arr.length; i++) {
+				if (i >= (FAS.config.total_load + obj.loaded)) {
+					// Stop loading icons once results meet the threshhold.
+					obj.loaded = i;
+					FAS.config.scroll_threshhold = FAS.config.scroll_threshhold - 500;
+					resolve();
+					break;
+
 				} else {
-					obj = FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category]
-					arr = Object.values(obj.icons);
-				}
-
-				for (let i=obj.loaded; i < arr.length; i++) {
-					if (i >= (FAS.config.total_load + obj.loaded)) {
-						// Stop loading icons once results meet the threshhold.
-						obj.loaded = i;
-						FAS.config.scroll_threshhold = FAS.config.scroll_threshhold - 500;
-						resolve();
-						break;
-
-					} else {
-						// delaying output by 1ms allows for a smooth flow of results.
-						setTimeout(() => {
-							if (is_search) {
+					// delaying output by 1ms allows for a smooth flow of results.
+					setTimeout(() => {
+						if (is_search) {
+							if (FAS.config.search.search_all_icons || FAS.selectors[selector_id].category == "all") {
+								arr[i].styles.forEach(style => {
+									selector.insertAdjacentHTML("beforeend",arr[i].svg[style].raw);
+								})
+							} else {
+								if (arr[i].svg[FAS.selectors[selector_id].category]) {
+									selector.insertAdjacentHTML("beforeend",arr[i].svg[FAS.selectors[selector_id].category].raw);
+								}
+							}
+						} else {
+							if (FAS.selectors[selector_id].category == "all") {
 								arr[i].styles.forEach(style => {
 									selector.insertAdjacentHTML("beforeend",arr[i].svg[style].raw);
 								})
 							} else {
 								selector.insertAdjacentHTML("beforeend",arr[i].svg[FAS.selectors[selector_id].category].raw);
 							}
+						}
 
-							if ((i+1) >= arr.length) {
-								// All icons of this category have loaded.
-								obj.all_loaded = true;
-								obj.loaded = i;
+						if ((i+1) >= arr.length) {
+							// All icons of this category have loaded.
+							obj.all_loaded = true;
+							obj.loaded = i;
 
-								if (FAS.config.show_debug) {
-									console.log("FAS: All icons loaded.");
-								}
-
-								resolve();
+							if (FAS.config.debug.enabled) {
+								console.log("FAS: All icons loaded.");
 							}
-						},1)
-					}
 
-
+							resolve();
+						}
+					},1)
 				}
+
 
 			}
 		})
 		await output;
-		if (FAS.config.show_debug) {
-			console.log("FAS: Outputting icons completed in " + (performance.now() - lt1).toFixed() + "ms");
+		if (FAS.config.debug.enabled) {
+			console.log("FAS: Outputting icons completed in " + (performance.now() - FAS.config.debug.lt1).toFixed() + "ms");
 		}
 		setTimeout(() => {
 		 	// Use timeout to prevent constant scrolling flooding the loading system.
@@ -173,11 +170,25 @@ const FAS = {
 		},100)
 	},
 
-	initSelector: () => {
+	initSelector: async () => {
 
-		FAS.selectors[event.target.dataset.faSelector] = {
+		let selector_id = event.target.dataset.faSelector;
+		let sort_icons = false;
+
+		if (FAS.icons == null) {
+			// If we havent loaded the icons yet, load them in!
+			sort_icons = true;
+			await FAS.fetchIcons(selector_id);
+		}
+
+		FAS.selectors[selector_id] = {
 			category: FAS.config.category,
 			sortedIcons: {
+				all: {
+					all_loaded: false,
+					loaded: 0,
+					icons: FAS.icons
+				},
 				brands: {
 					all_loaded: false,
 					loaded: 0,
@@ -195,6 +206,10 @@ const FAS = {
 				}
 			},
 		};
+
+		if (sort_icons) {
+			FAS.sortIcons(selector_id);
+		}
 
 		if (Object.values(FAS.selectors).length > 1) {
 			// if icons have already been loaded and sorted, use stored info..
@@ -225,9 +240,9 @@ const FAS = {
 			}
 		}
 
-		FAS.createChildren(event.target.dataset.faSelector);
-		FAS.createCategorys(event.target.dataset.faSelector);
-		FAS.outPutIcons(event.target.dataset.faSelector);
+		FAS.createChildren(selector_id);
+		FAS.createCategorys(selector_id);
+		FAS.outPutIcons(selector_id);
 
 	},
 
@@ -238,10 +253,12 @@ const FAS = {
 		childContainer.setAttribute("class", "fa-child-container");
 		selector.appendChild(childContainer);
 
-		let searchField = document.createElement("input");
-		searchField.setAttribute("placeholder", FAS.config.search.field_placeholder);
-		searchField.setAttribute("onkeyup", "FAS.searchIcons()");
-		selector.children[0].appendChild(searchField);
+		if (FAS.config.search.enabled) {
+			let searchField = document.createElement("input");
+			searchField.setAttribute("placeholder", FAS.config.search.field_placeholder);
+			searchField.setAttribute("onkeyup", "FAS.searchIcons()");
+			selector.children[0].appendChild(searchField);
+		}
 
 		let el = document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container");
 		el.addEventListener('scroll', () => {
@@ -329,8 +346,8 @@ const FAS = {
 		};
 		results.icons.length = 0;
 		let search = FAS.icons;
-		if (!FAS.config.search_all_icons) {
-			//...
+		if (!FAS.config.search.search_all_icons) {
+			let search = FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category].icons;
 		}
 
 		Object.values(search).forEach(icon => {
@@ -339,12 +356,14 @@ const FAS = {
 				return;
 			}
 
-			icon.search.terms.forEach(term => {
-			  if (term.includes(searchedFor)) {
-			  	results.icons.push(icon)
-			  	return;
-			  }
-			})
+			if (FAS.config.search.use_alias_terms) {
+				icon.search.terms.forEach(term => {
+				  if (term.includes(searchedFor)) {
+				  	results.icons.push(icon)
+				  	return;
+				  }
+				})
+			}
 			return;
 		})
 		FAS.clearSelector(selector_id);
@@ -365,8 +384,9 @@ document.querySelectorAll("[data-fa-selector]").forEach(el => {
 			FAS.initSelector();
 		} else if (event.target.dataset.faSelector && event.target.children[0].offsetHeight > 0) {
 			event.target.children[0].style.display = "none";
-		} else {
+		} else if (!event.target.classList.contains("FASCategory") && event.target.nodeName != "INPUT") {
 			event.target.children[0].style.display = "block";
 		}
+		return false;
 	})
 })
