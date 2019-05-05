@@ -116,8 +116,16 @@ const FAS = {
 				obj = is_search;
 				arr = is_search.icons;
 			} else {
-				obj = FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category]
-				arr = Object.values(obj.icons);
+				if (FAS.selectors[selector_id].category != "all") {
+					obj = FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category]
+					arr = Object.values(obj.icons);
+				} else {
+					 if (FAS.icons.loaded == null) {
+						 FAS.icons.loaded = 0;
+					 }
+					obj = FAS.icons;
+					arr = Object.values(FAS.icons);
+				}
 			}
 
 			for (let i=obj.loaded; i < arr.length; i++) {
@@ -159,17 +167,19 @@ const FAS = {
 							}
 						} else {
 							if (FAS.selectors[selector_id].category == "all") {
-								arr[i].styles.forEach(style => {
-									let uni;
-									let label;
-									if (FAS.config.show_unicode) {
-										uni = arr[i].unicode;
-									}
-									if (FAS.config.show_labels) {
-										label = arr[i].label;
-									}
-									FAS.outputThis(selector,arr[i].svg[style].raw,uni,label)
-								})
+								if (arr[i].styles != null) {
+									arr[i].styles.forEach(style => {
+										let uni;
+										let label;
+										if (FAS.config.show_unicode) {
+											uni = arr[i].unicode;
+										}
+										if (FAS.config.show_labels) {
+											label = arr[i].label;
+										}
+										FAS.outputThis(selector,arr[i].svg[style].raw,uni,label)
+									})
+								}
 							} else {
 								let uni;
 								let label;
@@ -358,17 +368,19 @@ const FAS = {
 
 				categorys.push(el);
 
+				let categoryContainer = document.createElement("div");
+				categoryContainer.setAttribute("class", "FACatagorys");
+
+				for (let i=0; i < categorys.length; i++) {
+					categoryContainer.appendChild(categorys[i]);
+				}
+
+				selector.appendChild(categoryContainer);
+
 			})
 		}
 
-		let categoryContainer = document.createElement("div");
-		categoryContainer.setAttribute("class", "FACatagorys");
 
-		for (let i=0; i < categorys.length; i++) {
-			categoryContainer.appendChild(categorys[i]);
-		}
-
-		selector.appendChild(categoryContainer);
 
 		FAS.createIconContainers(selector);
 	},
@@ -416,24 +428,28 @@ const FAS = {
 			icons: []
 		};
 		results.icons.length = 0;
-		let search = FAS.icons;
+		let search;
+		search = FAS.icons;
 		if (!FAS.config.search.search_all_icons) {
 			let search = FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category].icons;
 		}
 
 		Object.values(search).forEach(icon => {
-			if (icon.label.toLowerCase().includes(searchedFor)) {
-				results.icons.push(icon);
-				return;
+			if (icon.label) {
+				if (icon.label.toLowerCase().includes(searchedFor)) {
+					results.icons.push(icon);
+					return;
+				}
 			}
-
 			if (FAS.config.search.use_alias_terms) {
-				icon.search.terms.forEach(term => {
-				  if (term.includes(searchedFor)) {
-				  	results.icons.push(icon)
-				  	return;
-				  }
-				})
+				if (icon.search && icon.search.terms.length > 0) {
+					icon.search.terms.forEach(term => {
+					  if (term && term.length > 0 && term.includes(searchedFor)) {
+					  	results.icons.push(icon)
+					  	return;
+					  }
+					})
+				}
 			}
 			return;
 		})
