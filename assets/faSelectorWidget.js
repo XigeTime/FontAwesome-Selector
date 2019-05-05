@@ -339,6 +339,12 @@ const FAS = {
 	searchIcons: () => {
 		let searchedFor = event.target.value.toLowerCase();
 		let selector_id = event.target.parentElement.parentElement.dataset.faSelector;
+
+		if (searchedFor.length == 0) {
+			FAS.setCategory(FAS.selectors[selector_id].category,selector_id);
+			return false;
+		}
+
 		let results = {
 			all_loaded: false,
 			loaded: 0,
