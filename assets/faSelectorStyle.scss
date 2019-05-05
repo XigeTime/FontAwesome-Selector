@@ -1,7 +1,7 @@
 $accent: #7545E5;
 $white: #ffffff;
 
-#fa-selector {
+[data-fa-selector] {
   position:relative; // All selector elements must have relative positioning. (Looking to remove this dependancy in fututre updates)
   cursor: pointer;
 

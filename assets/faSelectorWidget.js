@@ -97,9 +97,9 @@ const FAS = {
 
 		let selector = null;
 		if (is_search) {
-			selector = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container .results");
+			selector = document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container .results");
 		} else {
-			selector = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container ." + FAS.selectors[selector_id].category);
+			selector = document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container ." + FAS.selectors[selector_id].category);
 		}
 
 		let output = new Promise((resolve) => {
@@ -174,40 +174,65 @@ const FAS = {
 	},
 
 	initSelector: () => {
-		if (event.target.id !== "fa-selector") return false;
-		if (event.target.children.length == 0) {
 
-			FAS.createChildren(event.target.dataset.selector);
-			FAS.createCategorys(event.target.dataset.selector);
-			FAS.outPutIcons(event.target.dataset.selector);
-
-			FAS.selectors[event.target.dataset.selector] = {
-				category: FAS.config.category,
-				sortedIcons: {
-					brands: {
-						all_loaded: false,
-						loaded: 0,
-						icons: []
-					},
-					solid: {
-						all_loaded: false,
-						loaded: 0,
-						icons: []
-					},
-					regular: {
-						all_loaded: false,
-						loaded: 0,
-						icons: []
-					}
+		FAS.selectors[event.target.dataset.faSelector] = {
+			category: FAS.config.category,
+			sortedIcons: {
+				brands: {
+					all_loaded: false,
+					loaded: 0,
+					icons: []
 				},
-			};
+				solid: {
+					all_loaded: false,
+					loaded: 0,
+					icons: []
+				},
+				regular: {
+					all_loaded: false,
+					loaded: 0,
+					icons: []
+				}
+			},
+		};
 
+		if (Object.values(FAS.selectors).length > 1) {
+			// if icons have already been loaded and sorted, use stored info..
+			let sid;
+			for (let i=0; i <= Object.values(FAS.selectors).length; i++) {
+				if (Object.values(FAS.selectors)[i].sortedIcons.brands.icons.length > 0) {
+					sid = i;
+					break;
+				}
+			}
+
+			FAS.selectors[event.target.dataset.faSelector].sortedIcons = {
+				brands: {
+					all_loaded: false,
+					loaded: 0,
+					icons: Object.values(FAS.selectors)[sid].sortedIcons.brands.icons
+				},
+				solid: {
+					all_loaded: false,
+					loaded: 0,
+					icons: Object.values(FAS.selectors)[sid].sortedIcons.solid.icons
+				},
+				regular: {
+					all_loaded: false,
+					loaded: 0,
+					icons: Object.values(FAS.selectors)[sid].sortedIcons.regular.icons
+				}
+			}
 		}
+
+		FAS.createChildren(event.target.dataset.faSelector);
+		FAS.createCategorys(event.target.dataset.faSelector);
+		FAS.outPutIcons(event.target.dataset.faSelector);
 
 	},
 
 	createChildren: selector_id => {
-		let selector = document.querySelector("[data-selector='" + selector_id + "']");
+		let selector = document.querySelector("[data-fa-selector='" + selector_id + "']");
 
 		let childContainer = document.createElement("span");
 		childContainer.setAttribute("class", "fa-child-container");
@@ -218,9 +243,9 @@ const FAS = {
 		searchField.setAttribute("onkeyup", "FAS.searchIcons()");
 		selector.children[0].appendChild(searchField);
 
-		let el = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container");
+		let el = document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container");
 		el.addEventListener('scroll', () => {
-			let selector_id = el.parentElement.dataset.selector;
+			let selector_id = el.parentElement.dataset.faSelector;
 			if (FAS.running != true && FAS.selectors[selector_id].sortedIcons[FAS.selectors[selector_id].category].all_loaded != true && el.scrollTop > FAS.config.scroll_threshhold) {
 				FAS.config.scroll_threshhold = FAS.config.scroll_threshhold + (FAS.config.scroll_threshhold - 200);
 				FAS.outPutIcons(selector_id);
@@ -239,7 +264,7 @@ const FAS = {
 	createCategorys: selector_id => {
 
 		let categorys = [];
-		let selector = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container");
+		let selector = document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container");
 
 		FAS.config.include_categorys.forEach(category => {
 
@@ -266,16 +291,16 @@ const FAS = {
 		FAS.createIconContainers(selector);
 	},
 
-	setCategory: (category,selector_id) => {
-		let catContainer = document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container ." + category);
+	setCategory: async (category,selector_id) => {
+		let catContainer = document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container ." + category);
 
 		if (catContainer.offsetHeight > 0) {
 			// check if category is currently visible.
 			return false;
 		} else {
 
-			FAS.clearSelector(selector_id);
 
+			FAS.clearSelector(selector_id);
 			FAS.selectors[selector_id].category = category;
 			FAS.outPutIcons(selector_id);
 			catContainer.classList.remove("hidden");
@@ -286,7 +311,7 @@ const FAS = {
 	},
 
 	clearSelector: selector_id => {
-		document.querySelectorAll("[data-selector='" + selector_id + "'] .fa-child-container > div").forEach(cat => {
+		document.querySelectorAll("[data-fa-selector='" + selector_id + "'] .fa-child-container > div").forEach(cat => {
 			if (cat.classList.contains("FACatagorys") != true) {
 				cat.style = "";
 				cat.classList.add("hidden");
@@ -296,7 +321,7 @@ const FAS = {
 
 	searchIcons: () => {
 		let searchedFor = event.target.value.toLowerCase();
-		let selector_id = event.target.parentElement.parentElement.dataset.selector;
+		let selector_id = event.target.parentElement.parentElement.dataset.faSelector;
 		let results = {
 			all_loaded: false,
 			loaded: 0,
@@ -323,9 +348,9 @@ const FAS = {
 			return;
 		})
 		FAS.clearSelector(selector_id);
-		document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container .results").innerHTML = null;
+		document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container .results").innerHTML = null;
 		FAS.outPutIcons(selector_id, results);
-		document.querySelector("[data-selector='" + selector_id + "'] .fa-child-container .results").style.display = "flex";
+		document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container .results").style.display = "flex";
 	}
 
 }
@@ -334,8 +359,14 @@ const FAS = {
 
 
 
-document.querySelectorAll("#fa-selector").forEach(el => {
+document.querySelectorAll("[data-fa-selector]").forEach(el => {
 	el.addEventListener("click", () => {
-		FAS.initSelector();
+		if (event.target.children.length == 0 && event.target.dataset.faSelector) {
+			FAS.initSelector();
+		} else if (event.target.dataset.faSelector && event.target.children[0].offsetHeight > 0) {
+			event.target.children[0].style.display = "none";
+		} else {
+			event.target.children[0].style.display = "block";
+		}
 	})
 })
