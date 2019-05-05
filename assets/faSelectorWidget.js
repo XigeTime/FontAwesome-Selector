@@ -9,14 +9,24 @@ const FAS = {
 		// This is the default category shown when the selector is first loaded.
 		category: "regular",
 
+		// If true, icon catagorys will be displayed at the top of the selector.
+		// If false, default category is used and cannot be changed by user.
+		// You can set the default category to "all" to display all icons uncategorised.
+		show_categorys: true,
+
+		// NOTE: When search is enabled, you MUST include "results" in this array!
+		// NOTE: Your default icon category MUST be included in this array!
+		// You can add "all" here to have a category containing all available icons.
+		include_categorys: ["all","solid","regular","brands","results"],
+
 		// Total icons to load at a time.
 		total_load: 150,
 
 		// Scroll threshhold before a new load is triggered.
 		scroll_threshhold: 500,
 
-		show_unicode: false,
-		show_labels: false,
+		show_unicode: false, 	// Display the icons unicodes.
+		show_labels: false, 	// Display the icons labels.
 
 		// Enable debug mode to recieve time stamps and logs in the console
 		debug: {
@@ -25,11 +35,6 @@ const FAS = {
 			lt1: null, 	// Used for storing timestamp values.
 			lt2: null 	// Used for storing timestamp values.
 		},
-
-		// NOTE: When search is enabled, you MUST include "results" in this array!
-		// NOTE: Your default icon category MUST be included in this array!
-		// You can add "all" here to have a category containing all available icons.
-		include_categorys: ["all","solid","regular","brands","results"],
 
 		search: {
 			enabled: true, 					// Enable/disable the search for all selectors.
@@ -341,18 +346,20 @@ const FAS = {
 		let categorys = [];
 		let selector = document.querySelector("[data-fa-selector='" + selector_id + "'] .fa-child-container");
 
-		FAS.config.include_categorys.forEach(category => {
+		if (FAS.config.show_categorys) {
+			FAS.config.include_categorys.forEach(category => {
 
-			if (category == "results") return false;
+				if (category == "results") return false;
 
-			let el = document.createElement("span");
-			el.setAttribute("onclick", "FAS.setCategory('" + category + "'," + selector_id + ")");
-			el.setAttribute("class", "FASCategory");
-			el.innerText = category;
+				let el = document.createElement("span");
+				el.setAttribute("onclick", "FAS.setCategory('" + category + "'," + selector_id + ")");
+				el.setAttribute("class", "FASCategory");
+				el.innerText = category;
 
-			categorys.push(el);
+				categorys.push(el);
 
-		})
+			})
+		}
 
 		let categoryContainer = document.createElement("div");
 		categoryContainer.setAttribute("class", "FACatagorys");
