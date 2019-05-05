@@ -1,6 +1,15 @@
 $accent: #7545E5;
 $white: #ffffff;
 
+@keyframes fasSpinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 #fa-selector {
   position:relative; // All selector elements must have relative positioning. (Looking to remove this dependancy in fututre updates)
   cursor: pointer;
@@ -37,6 +46,7 @@ $white: #ffffff;
     color: black;
     border: 1px solid grey;
     bottom:51px;
+    transform: translateY(-1px);
     input.search-fa-selector {
       position: sticky;
       top: 0;
@@ -48,7 +58,18 @@ $white: #ffffff;
       width: 20px;
       cursor: pointer;
     }
+
+    svg#fas-spinner {
+      all: unset;
+      position: absolute;
+      top: 80px;
+      width: 40px;
+      opacity: .6;
+      animation: fasSpinner 2s linear infinite;
+    }
   }
+
+
 
   // Modern theme
   &[data-theme='modern'] .fa-child-container {
@@ -68,12 +89,6 @@ $white: #ffffff;
       max-height: 41px;
       margin-bottom: .5em;
       display: none;
-    }
-
-    i.fa-spin {
-      display: none;
-      position: absolute;
-      opacity: .5;
     }
 
     i,svg {
