@@ -1,0 +1,45 @@
+#root {
+    max-width: 800px;
+    margin: auto;
+}
+
+.fa-icons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.fa-icon-results {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.fa-icon-container {
+    flex-basis: 10%;
+    min-width: 120px;
+    min-height: 120px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.fa-icon {
+    flex-basis: 100%;
+    display: flex;
+}
+
+.fa-icon svg {
+    margin: auto;
+    height: 50px;
+    width: 50px;
+}
+
+.fa-icon-container span {
+    display: block;
+    text-align: center;
+}
