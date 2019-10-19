@@ -138,6 +138,11 @@ class FASelector {
         }
 
         if (this.completed_icons.length < this.total_results) {
+            if (this.els.load_more) {
+                this.els.load_more.outerHTML = '';
+                this.els.load_more = null;
+            }
+
             // create the load more button
             let load_more = document.createElement('button');
             load_more.innerText = this.messages.load_more;
@@ -153,7 +158,7 @@ class FASelector {
             });
 
             this.els.load_more = load_more;
-            this.els.icons_container.appendChild(load_more);
+            this.els.asset_container.appendChild(load_more);
         } else {
             this.els.load_more.outerHTML = '';
             this.els.load_more = null;
