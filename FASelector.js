@@ -15,14 +15,16 @@ const FASDefaults = {
     unicodes: true, // show icon unicodes.
 
     icons_url: 'icons.json', // where the icon data is located.
-    icon_count: 20, // amount of icons to load at one time.
+    icon_count: 20, // default amount of icons to load at one time.
+
+    resultsPerPage: [5, 20, 50, 100] // Available options for the results per page field, set to false to disable.
 }
 
 class FASelector {
     constructor (options) {
-        const { messages, catagories, category, search, labels, unicodes, icons_url, icon_count } = (options) ? option : FASDefaults;
+        const { messages, catagories, category, search, labels, unicodes, icons_url, icon_count, resultsPerPage } = (options) ? option : FASDefaults;
 
-        this.messages = messages
+        this.messages = messages;
         this.catagories =  catagories;
         this.category =  category;
         this.search - search;
@@ -30,6 +32,7 @@ class FASelector {
         this.unicodes = unicodes;
         this.icons_url = icons_url;
         this.icon_count = icon_count;
+        this.resultsPerPage = resultsPerPage;
     }
 
     // Initialise the selector as it's own object component.
@@ -70,6 +73,12 @@ class FASelector {
             assetContainer.appendChild(search);
         }
 
+        let resultsPerPage;
+        if (this.resultsPerPage) {
+            resultsPerPage = this.renderResultsPerPage();
+            assetContainer.appendChild(resultsPerPage);
+        }
+
         assetContainer.appendChild(icons_container);
         container.appendChild(assetContainer);
 
@@ -79,7 +88,8 @@ class FASelector {
             button: button,
             icons_container: icons_container,
             search: search,
-            asset_container: assetContainer
+            asset_container: assetContainer,
+            results_per_page: resultsPerPage
         };
         
         // Return our element so that it can be placed anywhere in the dom.
@@ -232,6 +242,28 @@ class FASelector {
         
         // display icons using the filtered set.
         this.displayIcons(icons);
+    }
+
+    changeIconCount (count) {
+        this.icon_count = parseInt(count);
+        this.search();
+    }
+
+    renderResultsPerPage () {
+        let select = document.createElement('select');
+        select.classList.add('fa-results-per-page');
+
+        for (let option of this.resultsPerPage) {
+            let el = document.createElement('option');
+            el.value = option;
+            el.innerText = option;
+            if (option === this.icon_count) el.selected = true;
+            select.appendChild(el);
+        }
+
+        select.addEventListener('change', () => this.changeIconCount(this.els.results_per_page.value));
+
+        return select;
     }
 }
 
