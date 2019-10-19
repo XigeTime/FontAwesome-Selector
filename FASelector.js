@@ -20,16 +20,16 @@ const FASDefaults = {
 
 class FASelector {
     constructor (options) {
-        const { messages, catagories, category, search, labels, unicodes, icons_url, icon_count } = options;
+        const { messages, catagories, category, search, labels, unicodes, icons_url, icon_count } = (options) ? option : FASDefaults;
 
-        this.messages = (messages) ? messages : FASDefaults.messages;
-        this.catagories = (catagories) ? catagories : FASDefaults.catagories;
-        this.category = (category) ? category : FASDefaults.category;
-        this.search - (search) ? search : FASDefaults.search;
-        this.labels = (labels) ? labels : FASDefaults.labels;
-        this.unicodes = (unicodes) ? unicodes : FASDefaults.unicodes;
-        this.icons_url = (icons_url) ? icons_url : FASDefaults.icons_url;
-        this.icon_count = (icon_count) ? icon_count : FASDefaults.icon_count;
+        this.messages = messages
+        this.catagories =  catagories;
+        this.category =  category;
+        this.search - search;
+        this.labels = labels;
+        this.unicodes = unicodes;
+        this.icons_url = icons_url;
+        this.icon_count = icon_count;
     }
 
     // Initialise the selector as it's own object component.
@@ -230,18 +230,6 @@ class FASelector {
     }
 }
 
-const IconSearch = new FASelector({
-    messages: {
-        open: 'Open Selector', // button to open the selector.
-        load_more: 'Show More Icons!' // button to load more icons.
-    },
-    catagories: true, // show category icon filters.
-    category: 'solid', // default icon category
-    search: true, // show the search field.
-    labels: true, // show icon labels.
-    unicodes: true, // show icon unicodes.
-    icons_url: 'icons.json', // where the icon data is located.
-    icon_count: 20, // amount of icons to load at one time.
-});
+const IconSearch = new FASelector();
 
 document.getElementById('root').appendChild(IconSearch.init());
