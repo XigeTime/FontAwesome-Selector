@@ -22,17 +22,17 @@ const FASDefaults = {
 
 class FASelector {
     constructor (options) {
-        const { messages, catagories, category, search, labels, unicodes, icons_url, icon_count, resultsPerPage } = (options) ? option : FASDefaults;
+        const { messages, catagories, category, search, labels, unicodes, icons_url, icon_count, resultsPerPage } = (options) ? options : FASDefaults;
 
-        this.messages = messages;
-        this.catagories =  catagories;
-        this.category =  category;
-        this.search - search;
-        this.labels = labels;
-        this.unicodes = unicodes;
-        this.icons_url = icons_url;
-        this.icon_count = icon_count;
-        this.resultsPerPage = resultsPerPage;
+        this.messages = (messages) ? messages : FASDefaults.messages;
+        this.catagories = (catagories) ? catagories : FASDefaults.catagories;
+        this.category = (category) ? category : FASDefaults.category;
+        this.search - (search) ? search : FASDefaults.search;
+        this.labels = (labels) ? labels : FASDefaults.labels;
+        this.unicodes = (unicodes) ? unicodes : FASDefaults.unicodes;
+        this.icons_url = (icons_url) ? icons_url : FASDefaults.icons_url;
+        this.icon_count = (icon_count) ? icon_count : FASDefaults.icon_count;
+        this.resultsPerPage = (resultsPerPage) ? resultsPerPage : FASDefaults.resultsPerPage;
     }
 
     // Initialise the selector as it's own object component.
@@ -267,6 +267,6 @@ class FASelector {
     }
 }
 
-const IconSearch = new FASelector();
+const IconSearch = new FASelector({});
 
 document.getElementById('root').appendChild(IconSearch.init());
