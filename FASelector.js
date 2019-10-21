@@ -124,7 +124,7 @@ class FASelector {
     }
 
     async openSelector () {
-        if (this.isOpen) return;
+        if (this.isOpen) return this.closeSelector();
 
         this.isOpen = true;
         
@@ -139,6 +139,8 @@ class FASelector {
         this.els.asset_container.style.display = '';
 
         this.displayIcons();
+
+        document.addEventListener('click', () => this.closeSelector(), true);
     }
 
     loadIcon () {
@@ -337,6 +339,20 @@ class FASelector {
         select.addEventListener('change', () => this.changeCategory(this.els.catagory_select.value));
 
         return select;
+    }   
+
+    closeSelector () {
+        // if the selector isn't open, nothing to close
+        if (!this.isOpen) return;
+        const els = Object.values(this.els);
+
+        // if the target is one of our elements, prevent closing.
+        let isChild = false;
+        els.forEach(el => (el === event.target) ? isChild = true : '');
+        if (isChild) return;
+
+        this.isOpen = false;
+        this.els.asset_container.style.display = 'none';
     }
 }
 
