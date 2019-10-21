@@ -24,6 +24,8 @@ class FASelector {
     constructor (options) {
         const { messages, categories, category, search, labels, unicodes, icons_url, icon_count, resultsPerPage } = (options) ? options : FASDefaults;
 
+        this.isOpen = false;
+
         this.messages = (messages) ? messages : FASDefaults.messages;
         this.categories = (categories) ? categories : FASDefaults.categories;
         this.category = (category) ? category : FASDefaults.category;
@@ -105,6 +107,9 @@ class FASelector {
     }
 
     async openSelector () {
+        if (this.isOpen) return;
+        
+        this.isOpen = true;
         
         // If the icons haven't been loaded in yet, we'll do that first.
         if (!this.icons) {
