@@ -6,7 +6,7 @@ const FASDefaults = {
         load_more: 'Show More Icons!' // button to load more icons.
     },
 
-    catagories: true, // show icon category filters.
+    categories: ['solid', 'light', 'regular', 'brands', 'duotone'], // Available catagorys - set to false to disable catagorys.
     category: 'solid', // default icon category.
 
     search: true, // show the search field.
@@ -22,10 +22,10 @@ const FASDefaults = {
 
 class FASelector {
     constructor (options) {
-        const { messages, catagories, category, search, labels, unicodes, icons_url, icon_count, resultsPerPage } = (options) ? options : FASDefaults;
+        const { messages, categories, category, search, labels, unicodes, icons_url, icon_count, resultsPerPage } = (options) ? options : FASDefaults;
 
         this.messages = (messages) ? messages : FASDefaults.messages;
-        this.catagories = (catagories) ? catagories : FASDefaults.catagories;
+        this.categories = (categories) ? categories : FASDefaults.categories;
         this.category = (category) ? category : FASDefaults.category;
         this.search - (search) ? search : FASDefaults.search;
         this.labels = (labels) ? labels : FASDefaults.labels;
@@ -73,10 +73,17 @@ class FASelector {
             assetContainer.appendChild(search);
         }
 
+        // add results per page field
         let resultsPerPage;
         if (this.resultsPerPage) {
             resultsPerPage = this.renderResultsPerPage();
             assetContainer.appendChild(resultsPerPage);
+        }
+
+        let catagory_select;
+        if (this.categories) {
+            catagory_select = this.renderCategorySelect();
+            assetContainer.appendChild(catagory_select);
         }
 
         assetContainer.appendChild(icons_container);
@@ -89,7 +96,8 @@ class FASelector {
             icons_container: icons_container,
             search: search,
             asset_container: assetContainer,
-            results_per_page: resultsPerPage
+            results_per_page: resultsPerPage,
+            catagory_select: catagory_select
         };
         
         // Return our element so that it can be placed anywhere in the dom.
@@ -169,7 +177,7 @@ class FASelector {
 
             this.els.load_more = load_more;
             this.els.asset_container.appendChild(load_more);
-        } else {
+        } else if (this.els.load_more) {
             this.els.load_more.outerHTML = '';
             this.els.load_more = null;
         }
@@ -262,6 +270,28 @@ class FASelector {
         }
 
         select.addEventListener('change', () => this.changeIconCount(this.els.results_per_page.value));
+
+        return select;
+    }
+
+    changeCategory (category) {
+        this.category = category;
+        this.search();
+    }
+
+    renderCategorySelect () {
+        let select = document.createElement('select');
+        select.classList.add('fa-select-category');
+
+        for (let category of this.categories) {
+            let el = document.createElement('option');
+            el.value = category;
+            el.innerText = category;
+            if (category === this.category) el.selected = true;
+            select.appendChild(el);
+        }
+
+        select.addEventListener('change', () => this.changeCategory(this.els.catagory_select.value));
 
         return select;
     }
