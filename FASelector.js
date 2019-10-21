@@ -6,7 +6,7 @@ const FASDefaults = {
         load_more: 'Show More Icons!' // button to load more icons.
     },
 
-    categories: ['solid', 'light', 'regular', 'brands', 'duotone'], // Available catagorys - set to false to disable catagorys.
+    categories: ['solid', 'brands'], // Available catagorys - set to false to disable catagorys.
     category: 'solid', // default icon category.
 
     search: true, // show the search field.
@@ -17,12 +17,12 @@ const FASDefaults = {
     icons_url: 'icons.json', // where the icon data is located.
     icon_count: 20, // default amount of icons to load at one time.
 
-    resultsPerPage: [5, 20, 50, 100] // Available options for the results per page field, set to false to disable.
+    results_per_page: [5, 20, 50, 100] // Available options for the results per page field, set to false to disable.
 }
 
 class FASelector {
     constructor (options) {
-        const { messages, categories, category, search, labels, unicodes, icons_url, icon_count, resultsPerPage } = (options) ? options : FASDefaults;
+        const { messages, categories, category, search, labels, unicodes, icons_url, icon_count, results_per_page } = (options) ? options : FASDefaults;
 
         this.isOpen = false;
 
@@ -34,7 +34,7 @@ class FASelector {
         this.unicodes = (unicodes) ? unicodes : FASDefaults.unicodes;
         this.icons_url = (icons_url) ? icons_url : FASDefaults.icons_url;
         this.icon_count = (icon_count) ? icon_count : FASDefaults.icon_count;
-        this.resultsPerPage = (resultsPerPage) ? resultsPerPage : FASDefaults.resultsPerPage;
+        this.results_per_page = (results_per_page) ? results_per_page : FASDefaults.results_per_page;
     }
 
     // Initialise the selector as it's own object component.
@@ -61,35 +61,38 @@ class FASelector {
 
         container.appendChild(button);
 
-        let assetContainer = document.createElement('div');
-        assetContainer.classList.add('fa-asset-container');
+        let asset_container = document.createElement('div');
+        asset_container.classList.add('fa-asset-container');
+        asset_container.style.display = 'none';
 
         // We also need a child container to hold our icons!
         let icons_container = document.createElement('div');
         icons_container.classList.add('fa-icon-results');
+        icons_container.style.display = 'none';
 
         // add search if enabled
         let search;
         if (this.search) {
             search = this.renderSearch();
-            assetContainer.appendChild(search);
+            asset_container.appendChild(search);
         }
 
         // add results per page field
-        let resultsPerPage;
-        if (this.resultsPerPage) {
-            resultsPerPage = this.renderResultsPerPage();
-            assetContainer.appendChild(resultsPerPage);
+        let results;
+        if (this.results_per_page) {
+            results = this.renderResultsPerPage();
+            asset_container.appendChild(results);
         }
 
+        // add category field
         let catagory_select;
         if (this.categories) {
             catagory_select = this.renderCategorySelect();
-            assetContainer.appendChild(catagory_select);
+            asset_container.appendChild(catagory_select);
         }
 
-        assetContainer.appendChild(icons_container);
-        container.appendChild(assetContainer);
+        asset_container.appendChild(icons_container);
+        container.appendChild(asset_container);
 
         // bind the elements so we have easy access later.
         this.els = {
@@ -97,8 +100,8 @@ class FASelector {
             button: button,
             icons_container: icons_container,
             search: search,
-            asset_container: assetContainer,
-            results_per_page: resultsPerPage,
+            asset_container: asset_container,
+            results_per_page: results,
             catagory_select: catagory_select
         };
         
@@ -108,7 +111,7 @@ class FASelector {
 
     async openSelector () {
         if (this.isOpen) return;
-        
+
         this.isOpen = true;
         
         // If the icons haven't been loaded in yet, we'll do that first.
@@ -117,6 +120,9 @@ class FASelector {
             this.total_results = Object.values(this.icons).length;
             this.completed_icons = [];
         }
+
+        this.els.icons_container.style.display = '';
+        this.els.asset_container.style.display = '';
 
         this.displayIcons();
     }
@@ -149,18 +155,24 @@ class FASelector {
             el.appendChild(iconSvg);
             ++x; // increment
 
+            // if enabled, create the label
             if (this.labels) {
                 const label = this.addLabel(icon.label);
                 el.appendChild(label);
             }
 
+            // we want to log this icon so we don't duplicate it & then display
             this.completed_icons.push(icon.label);
             icons_container.appendChild(el);
 
+            // stop rendering icons when the limit has been reached.
             if (this.icon_count===x) break;
         }
 
-        if (this.completed_icons.length < this.total_results) {
+        // check to see if all icons have been loaded.
+        if (this.completed_icons.length < this.total_results) { 
+
+            // remove the current load more button.
             if (this.els.load_more) {
                 this.els.load_more.outerHTML = '';
                 this.els.load_more = null;
@@ -182,7 +194,9 @@ class FASelector {
 
             this.els.load_more = load_more;
             this.els.asset_container.appendChild(load_more);
+
         } else if (this.els.load_more) {
+            // remove the load more button.
             this.els.load_more.outerHTML = '';
             this.els.load_more = null;
         }
@@ -210,6 +224,7 @@ class FASelector {
     }
 
     renderSearch () {
+        // create the search input field and bind the search function.
         let search = document.createElement('div');
         search.classList.add('fa-search');
         
@@ -258,15 +273,17 @@ class FASelector {
     }
 
     changeIconCount (count) {
+        // change the count variable, which will be reflected when we request new search results.
         this.icon_count = parseInt(count);
         this.search();
     }
 
     renderResultsPerPage () {
+        // create the results per page field.
         let select = document.createElement('select');
         select.classList.add('fa-results-per-page');
 
-        for (let option of this.resultsPerPage) {
+        for (let option of this.results_per_page) {
             let el = document.createElement('option');
             el.value = option;
             el.innerText = option;
@@ -280,11 +297,13 @@ class FASelector {
     }
 
     changeCategory (category) {
+        // change the category variable, which will be reflected when we request new search results.
         this.category = category;
         this.search();
     }
 
     renderCategorySelect () {
+        // create the category field.
         let select = document.createElement('select');
         select.classList.add('fa-select-category');
 
@@ -302,6 +321,8 @@ class FASelector {
     }
 }
 
-const IconSearch = new FASelector({});
+const IconSearch = new FASelector({
+    categories: ['solid', 'light', 'regular', 'brands', 'duotone']
+});
 
 document.getElementById('root').appendChild(IconSearch.init());
