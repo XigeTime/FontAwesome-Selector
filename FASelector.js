@@ -360,4 +360,4 @@ const IconSearch = new FASelector({
     categories: ['solid', 'light', 'regular', 'brands', 'duotone']
 });
 
-document.getElementById('root').appendChild(IconSearch.init());
+document.getElementById('fas1').appendChild(IconSearch.init());
