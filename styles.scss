@@ -210,6 +210,22 @@ body {
 	overflow: hidden;
 	display: flex;
 	flex-wrap: wrap;
+
+	.fa-no-results {
+		text-align: center;
+		font-weight: bold;
+		letter-spacing: 1px;
+		word-spacing: 2px;
+		color: #3e237b;
+		
+		svg {
+			margin: auto;
+			margin-bottom: 20px;
+			display: block;
+			height: 100px;
+			fill: rgba(0,0,0,.3);
+		}
+	}
 	
 	> input,select {
 		line-height: 35px;

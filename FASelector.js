@@ -4,7 +4,12 @@ const FASDefaults = {
     messages: {
         open: 'Open Selector', // button to open the selector.
         load_more: 'Show More Icons!', // button to load more icons.
-        search_placeholder: 'Search...' // Placeholder text for the search field.
+        search_placeholder: 'Search...', // Placeholder text for the search field.
+        no_results: selector => {
+            let msg = document.createElement('div');
+            msg.innerHTML = selector.icons.frown.svg.solid.raw + 'We were unable to find any results for that!';
+            return msg;
+        } // Message to show when no search results have been found. (Can be a function to return html, html string, or plain text string)
     },
 
     classes: {
@@ -17,6 +22,7 @@ const FASDefaults = {
         search_class: 'fa-search', // For the search field.
         rpp_class: 'fa-results-per-page', // For the results per page field.
         cat_select_class: 'fa-select-category' // For the category select field.
+        no_results_class: 'fa-no-results' // For the no results message.
     },
 
     categories: ['solid', 'brands'], // Available catagorys - set to false to disable catagorys.
@@ -136,6 +142,15 @@ class FASelector {
             this.total_results = Object.values(this.icons).length;
             this.completed_icons = [];
         }
+
+        // remove no results message
+        if (this.els.no_results) {
+            this.els.no_results.outerHTML = null;
+            this.els.no_results = null;
+        }
+
+        // reset search
+        if (this.els.search) this.els.search.value = '';
 
         this.els.asset_container.style.display = '';
         setTimeout(() => this.els.asset_container.style.opacity = 1,1);
@@ -360,6 +375,23 @@ class FASelector {
         this.isOpen = false;
         this.els.asset_container.style.opacity = 0;
         setTimeout(() => this.els.asset_container.style.display = 'none', 510);
+    }
+    
+    noResults () {
+        const { no_results } = this.messages;
+        const { no_results_class } = this.classes;
+
+        let message = document.createElement('p');
+        message.classList.add(no_results_class);
+
+        if (typeof no_results === 'function') {
+            message.appendChild(no_results(this));
+        } else {
+            message.innerHTML = no_results;
+        }
+
+        this.els.no_results = message;
+        this.els.icons_container.appendChild(message);
     }
 }
 

@@ -188,6 +188,22 @@ body main > section > p {
   flex-wrap: wrap;
 }
 
+.fa-asset-container .fa-no-results {
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+  word-spacing: 2px;
+  color: #3e237b;
+}
+
+.fa-asset-container .fa-no-results svg {
+  margin: auto;
+  margin-bottom: 20px;
+  display: block;
+  height: 100px;
+  fill: rgba(0, 0, 0, 0.3);
+}
+
 .fa-asset-container > input, .fa-asset-container select {
   line-height: 35px;
   height: 40px;
