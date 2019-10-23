@@ -36,12 +36,16 @@ const FASDefaults = {
     icons_url: 'icons.json', // where the icon data is located.
     icon_count: 20, // default amount of icons to load at one time.
 
-    results_per_page: [5, 20, 50, 100] // Available options for the results per page field, set to false to disable.
+    results_per_page: [5, 20, 50, 100], // Available options for the results per page field, set to false to disable.
+
+    /* Function to run when an icon is selected, use this to display the icon in a comment box or similar.
+       available props: { selector, svg, label, changes, free, ligatures, search, styles, unicode, voted } */
+    select_icon: ({ svg, label, selector }) => console.log(svg[selector.category], label)
 }
 
 class FASelector {
     constructor (options) {
-        const { categories, category, search, labels, unicodes, icons_url, icon_count, results_per_page } = (options) ? options : FASDefaults;
+        const { categories, category, search, labels, unicodes, icons_url, icon_count, results_per_page, select_icon } = (options) ? options : FASDefaults;
         const { container_class, button_class, asset_class, results_container_class, icon_container_class, icon_class, search_class, rpp_class, cat_select_class, no_results_class } = (options.classes) ? options.classes : FASDefaults.classes;
         const { open, load_more, search_placeholder, no_results} = (options.messages) ? options.messages : FASDefaults.messages;
 
@@ -56,6 +60,7 @@ class FASelector {
         this.icons_url = (icons_url) ? icons_url : FASDefaults.icons_url;
         this.icon_count = (icon_count) ? icon_count : FASDefaults.icon_count;
         this.results_per_page = (results_per_page) ? results_per_page : FASDefaults.results_per_page;
+        this.select_icon = (select_icon) ? select_icon : FASDefaults.select_icon;
         // bind classes
         this.classes = {
             container_class: (container_class) ? container_class : FASDefaults.classes.container_class,
@@ -217,6 +222,13 @@ class FASelector {
                 const label = this.addLabel(icon.label);
                 el.appendChild(label);
             }
+
+            if (typeof this.select_icon === 'function') {
+                el.addEventListener('click', () => this.select_icon({
+                    selector: this,
+                    ...icon
+                }));
+            } else console.log('select_icon must be a function!')
 
             // we want to log this icon so we don't duplicate it & then display
             this.completed_icons.push(icon.label);
