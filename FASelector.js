@@ -21,7 +21,7 @@ const FASDefaults = {
         icon_class: 'fa-icon', // For the icon itself.
         search_class: 'fa-search', // For the search field.
         rpp_class: 'fa-results-per-page', // For the results per page field.
-        cat_select_class: 'fa-select-category' // For the category select field.
+        cat_select_class: 'fa-select-category', // For the category select field.
         no_results_class: 'fa-no-results' // For the no results message.
     },
 
@@ -41,12 +41,13 @@ const FASDefaults = {
 
 class FASelector {
     constructor (options) {
-        const { messages, categories, category, search, labels, unicodes, icons_url, icon_count, results_per_page, classes } = (options) ? options : FASDefaults;
+        const { categories, category, search, labels, unicodes, icons_url, icon_count, results_per_page } = (options) ? options : FASDefaults;
+        const { container_class, button_class, asset_class, results_container_class, icon_container_class, icon_class, search_class, rpp_class, cat_select_class, no_results_class } = (options.classes) ? options.classes : FASDefaults.classes;
+        const { open, load_more, search_placeholder, no_results} = (options.messages) ? options.messages : FASDefaults.messages;
 
         this.isOpen = false;
 
-        this.classes = (classes) ? classes : FASDefaults.classes;
-        this.messages = (messages) ? messages : FASDefaults.messages;
+        // bind options
         this.categories = (categories) ? categories : FASDefaults.categories;
         this.category = (category) ? category : FASDefaults.category;
         this.search - (search) ? search : FASDefaults.search;
@@ -55,6 +56,26 @@ class FASelector {
         this.icons_url = (icons_url) ? icons_url : FASDefaults.icons_url;
         this.icon_count = (icon_count) ? icon_count : FASDefaults.icon_count;
         this.results_per_page = (results_per_page) ? results_per_page : FASDefaults.results_per_page;
+        // bind classes
+        this.classes = {
+            container_class: (container_class) ? container_class : FASDefaults.classes.container_class,
+            button_class: (button_class) ? button_class : FASDefaults.classes.button_class,
+            asset_class: (asset_class) ? asset_class : FASDefaults.classes.asset_class,
+            results_container_class: (results_container_class) ? results_container_class : FASDefaults.classes.results_container_class,
+            icon_container_class: (icon_container_class) ? icon_container_class : FASDefaults.classes.icon_container_class,
+            icon_class: (icon_class) ? icon_class : FASDefaults.classes.icon_class,
+            search_class: (search_class) ? search_class : FASDefaults.classes.search_class,
+            rpp_class: (rpp_class) ? rpp_class : FASDefaults.classes.rpp_class,
+            cat_select_class: (cat_select_class) ? cat_select_class : FASDefaults.classes.cat_select_class,
+            no_results_class: (no_results_class) ? no_results_class : FASDefaults.classes.no_results_class
+        }
+        // bind messages
+        this.messages = {
+            open: (open) ? open : FASDefaults.messages.open,
+            load_more: (load_more) ? load_more : FASDefaults.messages.load_more,
+            search_placeholder: (search_placeholder) ? search_placeholder : FASDefaults.messages.search_placeholder,
+            no_results: (no_results) ? no_results : FASDefaults.messages.no_results
+        }
     }
 
     // Initialise the selector as it's own object component.
