@@ -3,7 +3,8 @@ const FASDefaults = {
 
     messages: {
         open: 'Open Selector', // button to open the selector.
-        load_more: 'Show More Icons!' // button to load more icons.
+        load_more: 'Show More Icons!', // button to load more icons.
+        search_placeholder: 'Search...' // Placeholder text for the search field.
     },
 
     classes: {
@@ -78,11 +79,12 @@ class FASelector {
         let asset_container = document.createElement('div');
         asset_container.classList.add(asset_class);
         asset_container.style.display = 'none';
+        asset_container.style.opacity = 0;
+        asset_container.style.transition = 'opacity .5s';
 
         // We also need a child container to hold our icons!
         let icons_container = document.createElement('div');
         icons_container.classList.add(results_container_class);
-        icons_container.style.display = 'none';
 
         // add search if enabled
         let search;
@@ -135,8 +137,8 @@ class FASelector {
             this.completed_icons = [];
         }
 
-        this.els.icons_container.style.display = '';
         this.els.asset_container.style.display = '';
+        setTimeout(() => this.els.asset_container.style.opacity = 1,1);
 
         this.displayIcons();
 
@@ -155,6 +157,8 @@ class FASelector {
         let x=0; // variable for storing the amount of displayed icons this round
 
         if (!icons) var icons = this.icons;
+
+        if (icons.length === 0) return this.noResults();
 
         for (let icon of Object.values(icons)) {
             // Prevent duplicating icons
@@ -210,7 +214,7 @@ class FASelector {
             });
 
             this.els.load_more = load_more;
-            this.els.asset_container.appendChild(load_more);
+            this.els.icons_container.appendChild(load_more);
 
         } else if (this.els.load_more) {
             // remove the load more button.
@@ -243,12 +247,14 @@ class FASelector {
 
     renderSearch () {
         const { search_class } = this.classes;
+        const { search_placeholder } = this.messages;
         // create the search input field and bind the search function.
         let search = document.createElement('div');
         search.classList.add(search_class);
         
         let input = document.createElement('input');
         input.addEventListener('keyup', () => this.search());
+        input.setAttribute('placeholder', search_placeholder);
 
         search.appendChild(input);
 
@@ -352,7 +358,8 @@ class FASelector {
         if (isChild) return;
 
         this.isOpen = false;
-        this.els.asset_container.style.display = 'none';
+        this.els.asset_container.style.opacity = 0;
+        setTimeout(() => this.els.asset_container.style.display = 'none', 510);
     }
 }
 

@@ -87,6 +87,9 @@ body main button, body main .btn {
   padding: 1rem 0;
   z-index: 1;
   transition: all .3s;
+  font-family: "Quicksand", sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
   margin: 4rem auto 2rem;
   display: block;
 }
@@ -114,10 +117,14 @@ body main > section {
   text-align: left;
   position: relative;
   margin: 0 auto;
+  min-height: 70vh;
   width: 60%;
   max-width: 700px;
   min-width: 270px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 body main > section ul {
@@ -169,43 +176,115 @@ body main > section > p {
   margin: 4rem 0;
 }
 
-.fa-icons {
+.fa-asset-container {
+  position: absolute;
+  background: #8252f1;
+  left: 0;
+  transition: opacity 1s;
+  height: 36vh;
+  width: 100%;
+  overflow: hidden;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-}
-
-.fa-icon-results {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.fa-icon-container {
-  flex-basis: 10%;
-  min-width: 120px;
-  min-height: 120px;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-wrap: wrap;
 }
 
-.fa-icon {
+.fa-asset-container > input, .fa-asset-container select {
+  line-height: 35px;
+  height: 40px;
+  background: #6e3ede;
+  border: 1px solid #8755fd;
+  margin: 7px 10px;
+  border-radius: 35px;
+  padding: 0 20px;
+  color: white;
+  letter-spacing: 1px;
+  outline: none;
+  transition: box-shadow .3s;
+}
+
+.fa-asset-container > input:not(input), .fa-asset-container select:not(input) {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.fa-asset-container > input::placeholder, .fa-asset-container select::placeholder {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.fa-asset-container > input:focus, .fa-asset-container select:focus {
+  box-shadow: 0px 0px 0px 1px #8d60f5;
+}
+
+.fa-asset-container > input option, .fa-asset-container select option {
+  color: white;
+  padding: 3px;
+}
+
+.fa-asset-container .fa-icon-results {
+  height: calc(100% - 60px);
+  width: 100%;
+  overflow-y: scroll;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.fa-asset-container .fa-icon-results::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 5px;
+  padding: 2px;
+  margin: 2px;
+}
+
+.fa-asset-container .fa-icon-results::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.fa-asset-container .fa-icon-results::-webkit-scrollbar-thumb {
+  background: #7545E5;
+  border-radius: 5px;
+}
+
+.fa-asset-container .fa-icon-results::-webkit-scrollbar-thumb:hover {
+  background: #7545E5;
+}
+
+.fa-asset-container .fa-icon-results .btn {
+  margin: 20px;
+}
+
+.fa-asset-container .fa-icon-results .fa-icon-container {
+  margin: 10px;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.fa-asset-container .fa-icon-results .fa-icon-container .fa-icon {
   flex-basis: 100%;
   display: flex;
 }
 
-.fa-icon svg {
+.fa-asset-container .fa-icon-results .fa-icon-container .fa-icon svg {
   margin: auto;
-  height: 50px;
-  width: 50px;
+  height: 35px;
+  width: 35px;
+  fill: white;
+  opacity: .8;
 }
 
-.fa-icon-container span {
+.fa-asset-container .fa-icon-results .fa-icon-container span {
   display: block;
   text-align: center;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  height: 30px;
 }
